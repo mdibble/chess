@@ -3,11 +3,24 @@
 class Piece {
 
     public:
-        char id = 'X';
+        char id;
         char side;
         int row;
         int col;
-        bool ingame = true;
+        bool ingame;
+        void move(int, int);
+        char getid();
+
+        Piece(int set_id, char set_side, int set_col, int set_row) {
+
+            this -> id = set_id;
+            this -> side = set_side;
+            this -> ingame = true;
+            this -> col = set_col;
+            this -> row = set_row;
+
+            std::cout<<"Created piece with " << id << " and " << side;
+        }
     
 };
 
@@ -54,11 +67,19 @@ class Tile {
 
     public:
         bool occupied = false;
-        int row;
-        int col;
         Piece piece;
 
 };
+
+void Piece::move(int col, int row) {
+
+    std::cout << "Moving piece";
+}
+
+char Piece::getid() {
+
+    return this -> id;
+}
 
 Tile board[8][8];
 
@@ -70,13 +91,6 @@ Queen b_Q, w_Q;
 King b_K, w_K;
 
 void initBoard() {
-
-    for (int i = 0; i < 8; i++)
-        for (int j = 0; j < 8; j++) {
-
-            board[j][i].col = j; 
-            board[j][i].row = i;
-        }
 
     board[0][0].piece = b_Rr;
     board[1][0].piece = b_Nr;
@@ -115,25 +129,22 @@ void initBoard() {
     for (int i = 0; i < 8; i++) 
         for (int j = 0; j < 8 ; j++) {
 
-            board[j][i].piece.col = board[j][i].col;
-            board[j][i].piece.row = board[j][i].row;
+            board[j][i].piece.col = j;
+            board[j][i].piece.row = i;
         }
 
-    return;
+    for (int i = 0; i < 8; i++) {
+
+        for (int j = 0; j < 8 ; j++) 
+            std::cout << board[j][i].piece.getid() << " ";
+
+        std::cout<<"\n";
+    }
 }
 
 int main() {
 
     initBoard();
-
-    for (int i = 0; i < 8; i++) {
-
-        for (int j = 0; j < 8 ; j++) {
-            std::cout << board[j][i].piece.id << " ";
-        }
-
-        std::cout<<"\n";
-    }
 
     return 0;
 }
