@@ -2,66 +2,141 @@
 
 class Piece {
 
-    public:
+    private:
         char id;
         char side;
         int row;
         int col;
-        bool ingame;
+        bool ingame; 
+        bool moved;
+
+    public:
         void move(int, int);
+
         char getid();
+        char getside();
+        int getrow();
+        int getcol();
+        bool getingame();
+        bool getmoved();
 
-        Piece(int set_id, char set_side, int set_col, int set_row) {
+        void setid(char arg);
+        void setside(char arg);
+        void setrow(int arg);
+        void setcol(int arg);
+        void setingame(bool arg);
+        void setmoved(bool arg);
 
-            this -> id = set_id;
-            this -> side = set_side;
-            this -> ingame = true;
-            this -> col = set_col;
-            this -> row = set_row;
-
-            std::cout<<"Created piece with " << id << " and " << side;
-        }
-    
+        Piece();
 };
+
+Piece::Piece() {
+
+    this -> setid('X');
+    this -> setside('X');
+    this -> setcol(-1);
+    this -> setrow(-1);
+    this -> setingame(false);
+    this -> setmoved(false);
+}
+
+char Piece::getid() {return this -> id;}
+char Piece::getside() {return this -> side;}
+int Piece::getrow() {return this -> row;}
+int Piece::getcol() {return this -> col;}
+bool Piece::getingame() {return this -> ingame;}
+
+void Piece::setid(char arg) {this -> id = arg;}
+void Piece::setside(char arg) {this -> side = arg;}
+void Piece::setrow(int arg) {this -> row = arg;}
+void Piece::setcol(int arg) {this -> col = arg;}
+void Piece::setingame(bool arg) {this -> ingame = arg;}
 
 class Pawn: public Piece {
 
     public:
-        const char id = 'P';
-        bool moved = false;
+        Pawn(char side, int col, int row);
 };
 
 class Knight: public Piece {
 
     public:
-        const char id = 'N';
+        Knight(char side, int col, int row);
 };
 
 class Bishop: public Piece {
 
     public:
-        const char id = 'B';
+        Bishop(char side, int col, int row);
 };
 
 class Rook: public Piece {
-
+    
     public:
-        const char id = 'R';
-        bool moved = false;
+        Rook(char side, int col, int row);
 };
 
 class Queen: public Piece {
 
     public:
-        const char id = 'Q';
+        Queen(char side, int col, int row);
 };
 
 class King: public Piece {
 
     public:
-        const char id = 'K';
-        bool check = false;
+        King(char side, int col, int row);
 };
+
+Pawn::Pawn(char side, int col, int row) {
+
+    this -> setid('P');
+    this -> setside(side);
+    this -> setcol(col);
+    this -> setrow(row);
+    this -> setingame(true);
+    this -> setmoved(false);
+}
+
+Knight::Knight(char side, int col, int row) {
+
+    this -> setid('N');
+    this -> setside(side);
+    this -> setcol(col);
+    this -> setrow(row);
+    this -> setingame(true);
+    this -> setmoved(false);
+}
+
+Bishop::Bishop(char side, int col, int row) {
+
+    this -> setid('B');
+    this -> setside(side);
+    this -> setcol(col);
+    this -> setrow(row);
+    this -> setingame(true);
+    this -> setmoved(false);
+}
+
+Queen::Queen(char side, int col, int row) {
+
+    this -> setid('Q');
+    this -> setside(side);
+    this -> setcol(col);
+    this -> setrow(row);
+    this -> setingame(true);
+    this -> setmoved(false);
+}
+
+King::King(char side, int col, int row) {
+
+    this -> setid('K');
+    this -> setside(side);
+    this -> setcol(col);
+    this -> setrow(row);
+    this -> setingame(true);
+    this -> setmoved(false);
+}
 
 class Tile {
 
@@ -129,8 +204,8 @@ void initBoard() {
     for (int i = 0; i < 8; i++) 
         for (int j = 0; j < 8 ; j++) {
 
-            board[j][i].piece.col = j;
-            board[j][i].piece.row = i;
+            board[j][i].piece.setcol(j);
+            board[j][i].piece.setrow(i);
         }
 
     for (int i = 0; i < 8; i++) {
