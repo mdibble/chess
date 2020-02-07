@@ -38,9 +38,6 @@ Piece::Piece() {
     this -> setmoved(false);
 }
 
-Piece *nullPiece = new Piece();
-Piece board[8][8];
-
 char Piece::getid() { return this -> id; }
 char Piece::getside() { return this -> side; }
 int Piece::getrow() { return this -> row; }
@@ -55,39 +52,39 @@ void Piece::setcol(int arg) { this -> col = arg; }
 void Piece::setingame(bool arg) { this -> ingame = arg; }
 void Piece::setmoved(bool arg) { this -> moved = arg; }
 
-void Piece::move(int col, int row) {
-    std::cout << "Moving Piece";
-}
+Piece *board[8][8];
+Piece *ptrPce;
+Piece *nullPiece = new Piece();
 
 class Pawn: public Piece {
-    public:
-        void move(int col, int row);
-        Pawn(char side, int col, int row);
+public:
+    void move(int col, int row);
+    Pawn(char side, int col, int row);
 };
 
 class Knight: public Piece {
-    public:
-        Knight(char side, int col, int row);
+public:
+    Knight(char side, int col, int row);
 };
 
 class Bishop: public Piece {
-    public:
-        Bishop(char side, int col, int row);
+public:
+    Bishop(char side, int col, int row);
 };
 
 class Rook: public Piece {
-    public:
-        Rook(char side, int col, int row);
+public:
+    Rook(char side, int col, int row);
 };
 
 class Queen: public Piece {
-    public:
-        Queen(char side, int col, int row);
+public:
+    Queen(char side, int col, int row);
 };
 
 class King: public Piece {
-    public:
-        King(char side, int col, int row);
+public:
+    King(char side, int col, int row);
 };
 
 Pawn::Pawn(char side, int col, int row) {
@@ -100,7 +97,49 @@ Pawn::Pawn(char side, int col, int row) {
 }
 
 void Pawn::move(int col, int row) {
-    std::cout<<"Placeholder";
+
+    if (col > 7 || col < 0 || row > 7 || row < 0) {
+        std::cout << "Invalid move for a pawn" << std::endl;
+        return;
+    }
+
+    int validMoveset[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0}, 
+                              {0, 0, 0, 0, 0, 0, 0, 0}, 
+                              {0, 0, 0, 0, 0, 0, 0, 0}, 
+                              {0, 0, 0, 0, 0, 0, 0, 0}, 
+                              {0, 0, 0, 0, 0, 0, 0, 0}, 
+                              {0, 0, 0, 0, 0, 0, 0, 0}, 
+                              {0, 0, 0, 0, 0, 0, 0, 0}, 
+                              {0, 0, 0, 0, 0, 0, 0, 0}};
+
+    // white pawns
+    if (this -> getrow() - 1 == row && this -> getcol() == col && board[this -> getrow() + 1][this -> getcol()] == nullPiece) {
+        validMoveset[this -> getrow() - 1][this -> getcol()] = 1;
+    }
+
+    if (this -> getrow() - 2 == row && this -> getcol() == col && board[this -> getrow() + 1][this -> getcol()] == nullPiece && this -> getmoved() == false) {
+        validMoveset[this -> getrow() - 2][this -> getcol()] = 1;
+    }
+
+    // check if value is in moveset
+    if (1) {
+
+        
+    }
+
+    else {
+
+        std::cout << "Can't move there" << std::endl;
+        return;
+    }
+
+    int tempCol = this -> getcol();
+    int tempRow = this -> getrow();
+    this -> setcol(col);
+    this -> setrow(row);
+
+    board[tempCol][tempRow] = nullPiece;
+    board[col][row] = this;
 }
 
 Knight::Knight(char side, int col, int row) {
@@ -183,43 +222,51 @@ Pawn *w_p7 = new Pawn('W', 6, 6);
 Pawn *w_p8 = new Pawn('W', 7, 6);
 
 void initBoard() {
-    board[0][0] = *b_r1;
-    board[1][0] = *b_n1;
-    board[2][0] = *b_b1;
-    board[3][0] = *b_q;
-    board[4][0] = *b_k;
-    board[5][0] = *b_b2;
-    board[6][0] = *b_n1;
-    board[7][0] = *b_r2; 
-    board[0][1] = *b_p1;
-    board[1][1] = *b_p2;
-    board[2][1] = *b_p3;
-    board[3][1] = *b_p4;
-    board[4][1] = *b_p5;
-    board[5][1] = *b_p6;
-    board[6][1] = *b_p7;
-    board[7][1] = *b_p8;
+    board[0][0] = b_r1;
+    board[1][0] = b_n1;
+    board[2][0] = b_b1;
+    board[3][0] = b_q;
+    board[4][0] = b_k;
+    board[5][0] = b_b2;
+    board[6][0] = b_n1;
+    board[7][0] = b_r2; 
+    board[0][1] = b_p1;
+    board[1][1] = b_p2;
+    board[2][1] = b_p3;
+    board[3][1] = b_p4;
+    board[4][1] = b_p5;
+    board[5][1] = b_p6;
+    board[6][1] = b_p7;
+    board[7][1] = b_p8;
 
-    board[0][7] = *w_r1;
-    board[1][7] = *w_n1;
-    board[2][7] = *w_b1;
-    board[3][7] = *w_q;
-    board[4][7] = *w_k;
-    board[5][7] = *w_b2;
-    board[6][7] = *w_n1;
-    board[7][7] = *w_r2; 
-    board[0][6] = *w_p1;
-    board[1][6] = *w_p2;
-    board[2][6] = *w_p3;
-    board[3][6] = *w_p4;
-    board[4][6] = *w_p5;
-    board[5][6] = *w_p6;
-    board[6][6] = *w_p7;
-    board[7][6] = *w_p8;
+    board[0][7] = w_r1;
+    board[1][7] = w_n1;
+    board[2][7] = w_b1;
+    board[3][7] = w_q;
+    board[4][7] = w_k;
+    board[5][7] = w_b2;
+    board[6][7] = w_n1;
+    board[7][7] = w_r2; 
+    board[0][6] = w_p1;
+    board[1][6] = w_p2;
+    board[2][6] = w_p3;
+    board[3][6] = w_p4;
+    board[4][6] = w_p5;
+    board[5][6] = w_p6;
+    board[6][6] = w_p7;
+    board[7][6] = w_p8;
+
+    for (int i = 2; i < 6; i++)
+        for (int j = 0; j < 8; j++) 
+            board[j][i] = nullPiece;
+}
+
+void printBoard() {
 
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
-            std::cout<<board[j][i].getid()<< " ";
+            ptrPce = board[j][i];
+            std::cout << ptrPce -> getid() << " ";
         }
         std::cout<<std::endl;
     }
@@ -227,6 +274,10 @@ void initBoard() {
 
 int main() {
     initBoard();
-    board[0][6].move(5, 5);
+    printBoard();
+
+    w_p2 -> move(4, 4);
+
+    printBoard();
     return 0;
 }
