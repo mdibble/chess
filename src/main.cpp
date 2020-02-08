@@ -10,7 +10,6 @@ private:
     bool moved;
 
 public:
-    void move(int, int);
 
     char getid();
     char getside();
@@ -25,6 +24,7 @@ public:
     void setcol(int arg);
     void setingame(bool arg);
     void setmoved(bool arg);
+    void move(int arg1, int arg2);
 
     Piece();
 };
@@ -51,6 +51,8 @@ void Piece::setrow(int arg) { this -> row = arg; }
 void Piece::setcol(int arg) { this -> col = arg; }
 void Piece::setingame(bool arg) { this -> ingame = arg; }
 void Piece::setmoved(bool arg) { this -> moved = arg; }
+
+void Piece::move(int arg1, int arg2) { std::cout<<"This piece is not in the game"<<std::endl; }
 
 Piece *board[8][8];
 Piece *ptrPce;
@@ -103,43 +105,84 @@ void Pawn::move(int col, int row) {
         return;
     }
 
-    int validMoveset[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0}, 
-                              {0, 0, 0, 0, 0, 0, 0, 0}, 
-                              {0, 0, 0, 0, 0, 0, 0, 0}, 
-                              {0, 0, 0, 0, 0, 0, 0, 0}, 
-                              {0, 0, 0, 0, 0, 0, 0, 0}, 
-                              {0, 0, 0, 0, 0, 0, 0, 0}, 
-                              {0, 0, 0, 0, 0, 0, 0, 0}, 
+    // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
+
+    int validMoveset[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
                               {0, 0, 0, 0, 0, 0, 0, 0}};
 
     // white pawns
-    if (this -> getrow() - 1 == row && this -> getcol() == col && board[this -> getrow() + 1][this -> getcol()] == nullPiece) {
-        validMoveset[this -> getrow() - 1][this -> getcol()] = 1;
+
+    if (this -> getside() == 'W') {
+
+        // forward one
+        if (this -> getrow() != 0 && board[this -> getcol()][this -> getrow() - 1] == nullPiece)
+            validMoveset[this -> getcol()][this -> getrow() - 1] = 1;
+
+        // forward two
+        if (this -> getmoved() == false && board[this -> getcol()][this -> getrow() - 2] == nullPiece)
+            validMoveset[this -> getcol()][this -> getrow() - 2] = 1;
+
+        // take left 
+        if (this -> getrow() != 0 && board[this -> getcol() - 1][this -> getrow() - 1] -> getside() == 'B')
+            validMoveset[this -> getcol() - 1][this -> getrow() - 1] = 2;
+
+        // take right
+        if (this -> getrow() != 0 && board[this -> getcol() + 1][this -> getrow() - 1] -> getside() == 'B')
+            validMoveset[this -> getcol() + 1][this -> getrow() - 1] = 2;
     }
 
-    if (this -> getrow() - 2 == row && this -> getcol() == col && board[this -> getrow() + 1][this -> getcol()] == nullPiece && this -> getmoved() == false) {
-        validMoveset[this -> getrow() - 2][this -> getcol()] = 1;
+    // black pawns
+
+    else if (this -> getside() == 'B') {
+
+        // forward one
+        if (this -> getrow() != 7 && board[this -> getcol()][this -> getrow() + 1] == nullPiece)
+            validMoveset[this -> getcol()][this -> getrow() + 1] = 1;
+
+        // forward two
+        if (this -> getmoved() == false && board[this -> getcol()][this -> getrow() + 2] == nullPiece)
+            validMoveset[this -> getcol()][this -> getrow() + 2] = 1;
+
+        // take left 
+        if (this -> getrow() != 7 && board[this -> getcol() - 1][this -> getrow() + 1] -> getside() == 'W')
+            validMoveset[this -> getcol() - 1][this -> getrow() + 1] = 2;
+
+        // take right
+        if (this -> getrow() != 7 && board[this -> getcol() + 1][this -> getrow() + 1] -> getside() == 'W')
+            validMoveset[this -> getcol() + 1][this -> getrow() + 1] = 2;
     }
 
-    // check if value is in moveset
-    if (1) {
-
-        
+    // print moveset
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++)
+            std::cout<<validMoveset[j][i]<<" ";
+        std::cout<<std::endl;
     }
 
-    else {
+    if (validMoveset[col][row] != 0) {
 
+        int tempCol = this -> getcol();
+        int tempRow = this -> getrow();
+        this -> setcol(col);
+        this -> setrow(row);
+
+        if (this -> getmoved() == false)
+            this -> setmoved(true);
+
+        // todo edit taken piece's status to removed from game
+
+        board[tempCol][tempRow] = nullPiece;
+        board[col][row] = this;
+    }
+
+    else
         std::cout << "Can't move there" << std::endl;
-        return;
-    }
-
-    int tempCol = this -> getcol();
-    int tempRow = this -> getrow();
-    this -> setcol(col);
-    this -> setrow(row);
-
-    board[tempCol][tempRow] = nullPiece;
-    board[col][row] = this;
 }
 
 Knight::Knight(char side, int col, int row) {
@@ -274,9 +317,10 @@ void printBoard() {
 
 int main() {
     initBoard();
-    printBoard();
 
-    w_p2 -> move(4, 4);
+    w_p2 -> move(1, 4);
+
+    // todo tiles?
 
     printBoard();
     return 0;
