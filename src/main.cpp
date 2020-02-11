@@ -10,7 +10,6 @@ private:
     bool moved;
 
 public:
-
     char getid();
     char getside();
     int getrow();
@@ -64,31 +63,6 @@ public:
     Pawn(char side, int col, int row);
 };
 
-class Knight: public Piece {
-public:
-    Knight(char side, int col, int row);
-};
-
-class Bishop: public Piece {
-public:
-    Bishop(char side, int col, int row);
-};
-
-class Rook: public Piece {
-public:
-    Rook(char side, int col, int row);
-};
-
-class Queen: public Piece {
-public:
-    Queen(char side, int col, int row);
-};
-
-class King: public Piece {
-public:
-    King(char side, int col, int row);
-};
-
 Pawn::Pawn(char side, int col, int row) {
     this -> setid('P');
     this -> setside(side);
@@ -101,7 +75,7 @@ Pawn::Pawn(char side, int col, int row) {
 void Pawn::move(int col, int row) {
 
     if (col > 7 || col < 0 || row > 7 || row < 0) {
-        std::cout << "Invalid move for a pawn" << std::endl;
+        std::cout << "Invalid move" << std::endl;
         return;
     }
 
@@ -166,6 +140,7 @@ void Pawn::move(int col, int row) {
     }
 
     if (validMoveset[col][row] != 0) {
+        board[col][row] -> setingame(false);
 
         int tempCol = this -> getcol();
         int tempRow = this -> getrow();
@@ -175,8 +150,6 @@ void Pawn::move(int col, int row) {
         if (this -> getmoved() == false)
             this -> setmoved(true);
 
-        // todo edit taken piece's status to removed from game
-
         board[tempCol][tempRow] = nullPiece;
         board[col][row] = this;
     }
@@ -184,6 +157,32 @@ void Pawn::move(int col, int row) {
     else
         std::cout << "Can't move there" << std::endl;
 }
+
+class Knight: public Piece {
+public:
+    Knight(char side, int col, int row);
+};
+
+class Bishop: public Piece {
+public:
+    Bishop(char side, int col, int row);
+};
+
+class Rook: public Piece {
+public:
+    void move(int col, int row);
+    Rook(char side, int col, int row);
+};
+
+class Queen: public Piece {
+public:
+    Queen(char side, int col, int row);
+};
+
+class King: public Piece {
+public:
+    King(char side, int col, int row);
+};
 
 Knight::Knight(char side, int col, int row) {
     this -> setid('N');
@@ -210,6 +209,104 @@ Rook::Rook(char side, int col, int row) {
     this -> setrow(row);
     this -> setingame(true);
     this -> setmoved(false);
+}
+
+void Rook::move(int col, int row) {
+
+    if (col > 7 || col < 0 || row > 7 || row < 0) {
+        std::cout << "Invalid move" << std::endl;
+        return;
+    }
+
+    // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
+
+    int validMoveset[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0}};
+
+    int tile;
+    
+    // left columns
+    tile = this -> getcol();
+    while (tile >= 0) {
+        if (board[tile][this -> getrow()] == nullPiece)
+            validMoveset[tile][this -> getrow()] = 1;
+
+        else if (board[tile][this -> getrow()] -> getside() != this -> getside()) {
+            validMoveset[tile][this -> getrow()] = 2;
+            break;
+        }
+        tile--;
+    }
+
+    // right columns
+    tile = this -> getcol();
+    while (tile <= 7) {
+        if (board[tile][this -> getrow()] == nullPiece)
+            validMoveset[tile][this -> getrow()] = 1;
+
+        else if (board[tile][this -> getrow()] -> getside() != this -> getside()) {
+            validMoveset[tile][this -> getrow()] = 2;
+            break;
+        }
+        tile++;
+    }
+
+    // rows upward
+    tile = this -> getrow();
+    while (tile >= 0) {
+        if (board[this -> getcol()][tile] == nullPiece)
+            validMoveset[this -> getcol()][tile] = 1;
+
+        else if (board[this -> getcol()][tile] -> getside() != this -> getside()) {
+            validMoveset[this -> getcol()][tile] = 2;
+            break;
+        }
+        tile--;
+    }
+
+    // rows downward
+    tile = this -> getrow();
+    while (tile <= 7) {
+        if (board[this -> getcol()][tile] == nullPiece)
+            validMoveset[this -> getcol()][tile] = 1;
+
+        else if (board[this -> getcol()][tile] -> getside() != this -> getside()) {
+            validMoveset[this -> getcol()][tile] = 2;
+            break;
+        }
+        tile++;
+    }
+
+    // print moveset
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++)
+            std::cout<<validMoveset[j][i]<<" ";
+        std::cout<<std::endl;
+    }
+
+    if (validMoveset[col][row] != 0) {
+        board[col][row] -> setingame(false);
+
+        int tempCol = this -> getcol();
+        int tempRow = this -> getrow();
+        this -> setcol(col);
+        this -> setrow(row);
+
+        if (this -> getmoved() == false)
+            this -> setmoved(true);
+
+        board[tempCol][tempRow] = nullPiece;
+        board[col][row] = this;
+    }
+
+    else
+        std::cout << "Can't move there" << std::endl;
 }
 
 Queen::Queen(char side, int col, int row) {
@@ -318,9 +415,10 @@ void printBoard() {
 int main() {
     initBoard();
 
-    w_p2 -> move(1, 4);
+    Rook *debug = new Rook('B', 4, 4);
+    board[4][4] = debug;
 
-    // todo tiles?
+    debug -> move(4, 6);
 
     printBoard();
     return 0;
