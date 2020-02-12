@@ -23,7 +23,7 @@ public:
     void setcol(int arg);
     void setingame(bool arg);
     void setmoved(bool arg);
-    void move(int arg1, int arg2);
+    virtual void move(int arg1, int arg2);
 
     Piece();
 };
@@ -958,10 +958,8 @@ void printBoard() {
 
 int main() {
     initBoard();
-
-    w_n1 -> move(2, 5);
-    // figure out why it calls Piece::move() for
-    // board[1][7] -> move(2, 5);
+    
+    board[1][7] -> move(2, 5);
 
     printBoard();
     return 0;
