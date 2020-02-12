@@ -63,6 +63,36 @@ public:
     Pawn(char side, int col, int row);
 };
 
+class Knight: public Piece {
+public:
+    void move(int col, int row);
+    Knight(char side, int col, int row);
+};
+
+class Bishop: public Piece {
+public:
+    void move(int col, int row);
+    Bishop(char side, int col, int row);
+};
+
+class Rook: public Piece {
+public:
+    void move(int col, int row);
+    Rook(char side, int col, int row);
+};
+
+class Queen: public Piece {
+public:
+    void move(int col, int row);
+    Queen(char side, int col, int row);
+};
+
+class King: public Piece {
+public:
+    void move(int col, int row);
+    King(char side, int col, int row);
+};
+
 Pawn::Pawn(char side, int col, int row) {
     this -> setid('P');
     this -> setside(side);
@@ -70,6 +100,7 @@ Pawn::Pawn(char side, int col, int row) {
     this -> setrow(row);
     this -> setingame(true);
     this -> setmoved(false);
+    board[col][row] = this;
 }
 
 void Pawn::move(int col, int row) {
@@ -158,32 +189,6 @@ void Pawn::move(int col, int row) {
         std::cout << "Can't move there" << std::endl;
 }
 
-class Knight: public Piece {
-public:
-    Knight(char side, int col, int row);
-};
-
-class Bishop: public Piece {
-public:
-    Bishop(char side, int col, int row);
-};
-
-class Rook: public Piece {
-public:
-    void move(int col, int row);
-    Rook(char side, int col, int row);
-};
-
-class Queen: public Piece {
-public:
-    Queen(char side, int col, int row);
-};
-
-class King: public Piece {
-public:
-    King(char side, int col, int row);
-};
-
 Knight::Knight(char side, int col, int row) {
     this -> setid('N');
     this -> setside(side);
@@ -191,6 +196,149 @@ Knight::Knight(char side, int col, int row) {
     this -> setrow(row);
     this -> setingame(true);
     this -> setmoved(false);
+    board[col][row] = this;
+}
+
+void Knight::move(int col, int row) {
+
+    if (col > 7 || col < 0 || row > 7 || row < 0) {
+        std::cout << "Invalid move" << std::endl;
+        return;
+    }
+
+    // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
+
+    int validMoveset[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0}};
+    
+    int colTile, rowTile;
+
+    // l2d1
+    colTile = this -> getcol() - 2;
+    rowTile = this -> getrow() + 1;
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // l2u1
+    colTile = this -> getcol() - 2;
+    rowTile = this -> getrow() - 1;
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // r2d1
+    colTile = this -> getcol() + 2;
+    rowTile = this -> getrow() + 1;
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // r2u1
+    colTile = this -> getcol() + 2;
+    rowTile = this -> getrow() - 1;
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // u2l1
+    colTile = this -> getcol() - 1;
+    rowTile = this -> getrow() - 2;
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // u2r1
+    colTile = this -> getcol() + 1;
+    rowTile = this -> getrow() - 2;
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // d2l1
+    colTile = this -> getcol() - 1;
+    rowTile = this -> getrow() + 2;
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // d2r1
+    colTile = this -> getcol() + 1;
+    rowTile = this -> getrow() + 2;
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // print moveset
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++)
+            std::cout<<validMoveset[j][i]<<" ";
+        std::cout<<std::endl;
+    }
+
+    if (validMoveset[col][row] != 0) {
+        board[col][row] -> setingame(false);
+
+        int tempCol = this -> getcol();
+        int tempRow = this -> getrow();
+        this -> setcol(col);
+        this -> setrow(row);
+
+        if (this -> getmoved() == false)
+            this -> setmoved(true);
+
+        board[tempCol][tempRow] = nullPiece;
+        board[col][row] = this;
+    }
+
+    else
+        std::cout << "Can't move there" << std::endl;
 }
 
 Bishop::Bishop(char side, int col, int row) {
@@ -200,6 +348,117 @@ Bishop::Bishop(char side, int col, int row) {
     this -> setrow(row);
     this -> setingame(true);
     this -> setmoved(false);
+    board[col][row] = this;
+}
+
+void Bishop::move(int col, int row) {
+
+    if (col > 7 || col < 0 || row > 7 || row < 0) {
+        std::cout << "Invalid move" << std::endl;
+        return;
+    }
+
+    // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
+
+    int validMoveset[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0}};
+    
+    int colTile, rowTile;
+
+    // left down
+    colTile = this -> getcol();
+    rowTile = this -> getrow();
+
+    while (colTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside()) {
+            validMoveset[colTile][rowTile] = 2;
+            break;
+        }
+        colTile--;
+        rowTile++;
+    }
+
+    // left up
+    colTile = this -> getcol();
+    rowTile = this -> getrow();
+
+    while (colTile >= 0 && rowTile >= 0) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside()) {
+            validMoveset[colTile][rowTile] = 2;
+            break;
+        }
+        colTile--;
+        rowTile--;
+    }
+
+    // right down
+    colTile = this -> getcol();
+    rowTile = this -> getrow();
+
+    while (colTile <= 7 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside()) {
+            validMoveset[colTile][rowTile] = 2;
+            break;
+        }
+        colTile++;
+        rowTile++;
+    }
+
+    // right up
+    colTile = this -> getcol();
+    rowTile = this -> getrow();
+
+    while (colTile <= 7 && rowTile >= 0) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside()) {
+            validMoveset[colTile][rowTile] = 2;
+            break;
+        }
+        colTile++;
+        rowTile--;
+    }
+
+    // print moveset
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++)
+            std::cout<<validMoveset[j][i]<<" ";
+        std::cout<<std::endl;
+    }
+
+    if (validMoveset[col][row] != 0) {
+        board[col][row] -> setingame(false);
+
+        int tempCol = this -> getcol();
+        int tempRow = this -> getrow();
+        this -> setcol(col);
+        this -> setrow(row);
+
+        if (this -> getmoved() == false)
+            this -> setmoved(true);
+
+        board[tempCol][tempRow] = nullPiece;
+        board[col][row] = this;
+    }
+
+    else
+        std::cout << "Can't move there" << std::endl;
 }
 
 Rook::Rook(char side, int col, int row) {
@@ -209,6 +468,7 @@ Rook::Rook(char side, int col, int row) {
     this -> setrow(row);
     this -> setingame(true);
     this -> setmoved(false);
+    board[col][row] = this;
 }
 
 void Rook::move(int col, int row) {
@@ -316,6 +576,180 @@ Queen::Queen(char side, int col, int row) {
     this -> setrow(row);
     this -> setingame(true);
     this -> setmoved(false);
+    board[col][row] = this;
+}
+
+void Queen::move(int col, int row) {
+
+    if (col > 7 || col < 0 || row > 7 || row < 0) {
+        std::cout << "Invalid move" << std::endl;
+        return;
+    }
+
+    // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
+
+    int validMoveset[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0}};
+    
+    int colTile, rowTile;
+
+    // left down
+    colTile = this -> getcol();
+    rowTile = this -> getrow();
+
+    while (colTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside()) {
+            validMoveset[colTile][rowTile] = 2;
+            break;
+        }
+        colTile--;
+        rowTile++;
+    }
+
+    // left up
+    colTile = this -> getcol();
+    rowTile = this -> getrow();
+
+    while (colTile >= 0 && rowTile >= 0) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside()) {
+            validMoveset[colTile][rowTile] = 2;
+            break;
+        }
+        colTile--;
+        rowTile--;
+    }
+
+    // right down
+    colTile = this -> getcol();
+    rowTile = this -> getrow();
+
+    while (colTile <= 7 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside()) {
+            validMoveset[colTile][rowTile] = 2;
+            break;
+        }
+        colTile++;
+        rowTile++;
+    }
+
+    // right up
+    colTile = this -> getcol();
+    rowTile = this -> getrow();
+
+    while (colTile <= 7 && rowTile >= 0) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside()) {
+            validMoveset[colTile][rowTile] = 2;
+            break;
+        }
+        colTile++;
+        rowTile--;
+    }
+
+    // left columns
+
+    rowTile = this -> getrow();
+    colTile = this -> getcol();
+
+    while (colTile >= 0) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside()) {
+            validMoveset[colTile][rowTile] = 2;
+            break;
+        }
+        colTile--;
+    }
+
+    // right columns
+    
+    rowTile = this -> getrow();
+    colTile = this -> getcol();
+
+    while (colTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside()) {
+            validMoveset[colTile][rowTile] = 2;
+            break;
+        }
+        colTile++;
+    }
+
+    // rows upward
+    rowTile = this -> getrow();
+    colTile = this -> getcol();
+
+    while (rowTile >= 0) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside()) {
+            validMoveset[colTile][rowTile] = 2;
+            break;
+        }
+        rowTile--;
+    }
+
+    // rows downward
+    
+    rowTile = this -> getrow();
+    colTile = this -> getcol();
+
+    while (rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside()) {
+            validMoveset[colTile][rowTile] = 2;
+            break;
+        }
+        rowTile++;
+    }
+
+    // print moveset
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++)
+            std::cout<<validMoveset[j][i]<<" ";
+        std::cout<<std::endl;
+    }
+
+    if (validMoveset[col][row] != 0) {
+        board[col][row] -> setingame(false);
+
+        int tempCol = this -> getcol();
+        int tempRow = this -> getrow();
+        this -> setcol(col);
+        this -> setrow(row);
+
+        if (this -> getmoved() == false)
+            this -> setmoved(true);
+
+        board[tempCol][tempRow] = nullPiece;
+        board[col][row] = this;
+    }
+
+    else
+        std::cout << "Can't move there" << std::endl;
 }
 
 King::King(char side, int col, int row) {
@@ -325,6 +759,149 @@ King::King(char side, int col, int row) {
     this -> setrow(row);
     this -> setingame(true);
     this -> setmoved(false);
+    board[col][row] = this;
+}
+
+void King::move(int col, int row) {
+
+    if (col > 7 || col < 0 || row > 7 || row < 0) {
+        std::cout << "Invalid move" << std::endl;
+        return;
+    }
+
+    // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
+
+    int validMoveset[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0}};
+    
+    int colTile, rowTile;
+
+    // left
+    colTile = this -> getcol() - 1;
+    rowTile = this -> getrow();
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // right
+    colTile = this -> getcol() + 1;
+    rowTile = this -> getrow();
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // up
+    colTile = this -> getcol();
+    rowTile = this -> getrow() - 1;
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // down
+    colTile = this -> getcol();
+    rowTile = this -> getrow() + 1;
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // left up
+    colTile = this -> getcol() - 1;
+    rowTile = this -> getrow() - 1;
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // left down
+    colTile = this -> getcol() - 1;
+    rowTile = this -> getrow() + 1;
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // right up
+    colTile = this -> getcol() + 1;
+    rowTile = this -> getrow() - 1;
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // right down
+    colTile = this -> getcol() + 1;
+    rowTile = this -> getrow() + 1;
+
+    if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
+        if (board[colTile][rowTile] == nullPiece)
+            validMoveset[colTile][rowTile] = 1;
+
+        else if (board[colTile][rowTile] -> getside() != this -> getside())
+            validMoveset[colTile][rowTile] = 2;
+    }
+
+    // print moveset
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++)
+            std::cout<<validMoveset[j][i]<<" ";
+        std::cout<<std::endl;
+    }
+
+    if (validMoveset[col][row] != 0) {
+        board[col][row] -> setingame(false);
+
+        int tempCol = this -> getcol();
+        int tempRow = this -> getrow();
+        this -> setcol(col);
+        this -> setrow(row);
+
+        if (this -> getmoved() == false)
+            this -> setmoved(true);
+
+        board[tempCol][tempRow] = nullPiece;
+        board[col][row] = this;
+    }
+
+    else
+        std::cout << "Can't move there" << std::endl;
 }
 
 Rook *b_r1 = new Rook('B', 0, 0);
@@ -362,39 +939,6 @@ Pawn *w_p7 = new Pawn('W', 6, 6);
 Pawn *w_p8 = new Pawn('W', 7, 6);
 
 void initBoard() {
-    board[0][0] = b_r1;
-    board[1][0] = b_n1;
-    board[2][0] = b_b1;
-    board[3][0] = b_q;
-    board[4][0] = b_k;
-    board[5][0] = b_b2;
-    board[6][0] = b_n1;
-    board[7][0] = b_r2; 
-    board[0][1] = b_p1;
-    board[1][1] = b_p2;
-    board[2][1] = b_p3;
-    board[3][1] = b_p4;
-    board[4][1] = b_p5;
-    board[5][1] = b_p6;
-    board[6][1] = b_p7;
-    board[7][1] = b_p8;
-
-    board[0][7] = w_r1;
-    board[1][7] = w_n1;
-    board[2][7] = w_b1;
-    board[3][7] = w_q;
-    board[4][7] = w_k;
-    board[5][7] = w_b2;
-    board[6][7] = w_n1;
-    board[7][7] = w_r2; 
-    board[0][6] = w_p1;
-    board[1][6] = w_p2;
-    board[2][6] = w_p3;
-    board[3][6] = w_p4;
-    board[4][6] = w_p5;
-    board[5][6] = w_p6;
-    board[6][6] = w_p7;
-    board[7][6] = w_p8;
 
     for (int i = 2; i < 6; i++)
         for (int j = 0; j < 8; j++) 
@@ -415,10 +959,9 @@ void printBoard() {
 int main() {
     initBoard();
 
-    Rook *debug = new Rook('B', 4, 4);
-    board[4][4] = debug;
-
-    debug -> move(4, 6);
+    w_n1 -> move(2, 5);
+    // figure out why it calls Piece::move() for
+    // board[1][7] -> move(2, 5);
 
     printBoard();
     return 0;
