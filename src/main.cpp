@@ -1,5 +1,7 @@
 #include <iostream>
 
+char turn = 'W';
+
 class Piece {
 private:
     char id;
@@ -23,7 +25,7 @@ public:
     void setcol(int arg);
     void setingame(bool arg);
     void setmoved(bool arg);
-    virtual void move(int arg1, int arg2);
+    virtual bool move(int arg1, int arg2);
 
     Piece();
 };
@@ -51,7 +53,7 @@ void Piece::setcol(int arg) { this -> col = arg; }
 void Piece::setingame(bool arg) { this -> ingame = arg; }
 void Piece::setmoved(bool arg) { this -> moved = arg; }
 
-void Piece::move(int arg1, int arg2) { std::cout<<"This piece is not in the game"<<std::endl; }
+bool Piece::move(int arg1, int arg2) { std::cout<<"This piece is not in the game"<<std::endl; return false; }
 
 Piece *board[8][8];
 Piece *ptrPce;
@@ -59,37 +61,37 @@ Piece *nullPiece = new Piece();
 
 class Pawn: public Piece {
 public:
-    void move(int col, int row);
+    bool move(int col, int row);
     Pawn(char side, int col, int row);
 };
 
 class Knight: public Piece {
 public:
-    void move(int col, int row);
+    bool move(int col, int row);
     Knight(char side, int col, int row);
 };
 
 class Bishop: public Piece {
 public:
-    void move(int col, int row);
+    bool move(int col, int row);
     Bishop(char side, int col, int row);
 };
 
 class Rook: public Piece {
 public:
-    void move(int col, int row);
+    bool move(int col, int row);
     Rook(char side, int col, int row);
 };
 
 class Queen: public Piece {
 public:
-    void move(int col, int row);
+    bool move(int col, int row);
     Queen(char side, int col, int row);
 };
 
 class King: public Piece {
 public:
-    void move(int col, int row);
+    bool move(int col, int row);
     King(char side, int col, int row);
 };
 
@@ -103,11 +105,11 @@ Pawn::Pawn(char side, int col, int row) {
     board[col][row] = this;
 }
 
-void Pawn::move(int col, int row) {
+bool Pawn::move(int col, int row) {
 
     if (col > 7 || col < 0 || row > 7 || row < 0) {
         std::cout << "Invalid move" << std::endl;
-        return;
+        return false;
     }
 
     // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
@@ -183,10 +185,11 @@ void Pawn::move(int col, int row) {
 
         board[tempCol][tempRow] = nullPiece;
         board[col][row] = this;
+        return true;
     }
-
-    else
-        std::cout << "Can't move there" << std::endl;
+    
+    std::cout << "Can't move there" << std::endl;
+    return false;
 }
 
 Knight::Knight(char side, int col, int row) {
@@ -199,11 +202,11 @@ Knight::Knight(char side, int col, int row) {
     board[col][row] = this;
 }
 
-void Knight::move(int col, int row) {
+bool Knight::move(int col, int row) {
 
     if (col > 7 || col < 0 || row > 7 || row < 0) {
         std::cout << "Invalid move" << std::endl;
-        return;
+        return false;
     }
 
     // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
@@ -335,10 +338,11 @@ void Knight::move(int col, int row) {
 
         board[tempCol][tempRow] = nullPiece;
         board[col][row] = this;
+        return true;
     }
-
-    else
-        std::cout << "Can't move there" << std::endl;
+    
+    std::cout << "Can't move there" << std::endl;
+    return false;
 }
 
 Bishop::Bishop(char side, int col, int row) {
@@ -351,11 +355,11 @@ Bishop::Bishop(char side, int col, int row) {
     board[col][row] = this;
 }
 
-void Bishop::move(int col, int row) {
+bool Bishop::move(int col, int row) {
 
     if (col > 7 || col < 0 || row > 7 || row < 0) {
         std::cout << "Invalid move" << std::endl;
-        return;
+        return false;
     }
 
     // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
@@ -455,10 +459,11 @@ void Bishop::move(int col, int row) {
 
         board[tempCol][tempRow] = nullPiece;
         board[col][row] = this;
+        return true;
     }
-
-    else
-        std::cout << "Can't move there" << std::endl;
+    
+    std::cout << "Can't move there" << std::endl;
+    return false;
 }
 
 Rook::Rook(char side, int col, int row) {
@@ -471,11 +476,11 @@ Rook::Rook(char side, int col, int row) {
     board[col][row] = this;
 }
 
-void Rook::move(int col, int row) {
+bool Rook::move(int col, int row) {
 
     if (col > 7 || col < 0 || row > 7 || row < 0) {
         std::cout << "Invalid move" << std::endl;
-        return;
+        return false;
     }
 
     // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
@@ -563,10 +568,11 @@ void Rook::move(int col, int row) {
 
         board[tempCol][tempRow] = nullPiece;
         board[col][row] = this;
+        return true;
     }
-
-    else
-        std::cout << "Can't move there" << std::endl;
+    
+    std::cout << "Can't move there" << std::endl;
+    return false;
 }
 
 Queen::Queen(char side, int col, int row) {
@@ -579,11 +585,11 @@ Queen::Queen(char side, int col, int row) {
     board[col][row] = this;
 }
 
-void Queen::move(int col, int row) {
+bool Queen::move(int col, int row) {
 
     if (col > 7 || col < 0 || row > 7 || row < 0) {
         std::cout << "Invalid move" << std::endl;
-        return;
+        return false;
     }
 
     // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
@@ -746,10 +752,11 @@ void Queen::move(int col, int row) {
 
         board[tempCol][tempRow] = nullPiece;
         board[col][row] = this;
+        return true;
     }
-
-    else
-        std::cout << "Can't move there" << std::endl;
+    
+    std::cout << "Can't move there" << std::endl;
+    return false;
 }
 
 King::King(char side, int col, int row) {
@@ -762,11 +769,11 @@ King::King(char side, int col, int row) {
     board[col][row] = this;
 }
 
-void King::move(int col, int row) {
+bool King::move(int col, int row) {
 
     if (col > 7 || col < 0 || row > 7 || row < 0) {
         std::cout << "Invalid move" << std::endl;
-        return;
+        return false;
     }
 
     // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
@@ -898,10 +905,11 @@ void King::move(int col, int row) {
 
         board[tempCol][tempRow] = nullPiece;
         board[col][row] = this;
+        return true;
     }
-
-    else
-        std::cout << "Can't move there" << std::endl;
+    
+    std::cout << "Can't move there" << std::endl;
+    return false;
 }
 
 Rook *b_r1 = new Rook('B', 0, 0);
@@ -938,15 +946,13 @@ Pawn *w_p6 = new Pawn('W', 5, 6);
 Pawn *w_p7 = new Pawn('W', 6, 6);
 Pawn *w_p8 = new Pawn('W', 7, 6);
 
-void initBoard() {
-
+void addNulls() {
     for (int i = 2; i < 6; i++)
         for (int j = 0; j < 8; j++) 
             board[j][i] = nullPiece;
 }
 
 void printBoard() {
-
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             ptrPce = board[j][i];
@@ -956,11 +962,75 @@ void printBoard() {
     }
 }
 
-int main() {
-    initBoard();
-    
-    board[1][7] -> move(2, 5);
+int parseInput(std::string str) {
+    if (str.at(0) < 'a' || str.at(0) > 'h' || str.at(1) < '1' || str.at(1) > '8') 
+        return -1;
 
+    int col;
+    int row;
+
+    col = (int)str.at(0) - 97;
+    row = 0;
+
+    for (int i = (int)str.at(1) - 48; i < 8; i++)
+        row++;
+
+    return (col * 10) + row;
+}
+
+void toPlay(char turn) {
+
+    int usrCol = -1, usrRow = -1, parse;
+    bool selectValid = false;
+    
+    while (!selectValid) {
+
+        std::cout << turn << " to move (select piece): ";
+    
+        std::string usrIn;
+        std::cin >> usrIn;
+
+        parse = parseInput(usrIn);
+
+        if (parse != -1) {
+            usrCol = parse / 10;
+            usrRow = parse % 10;
+
+            if (board[usrCol][usrRow] -> getside() == turn) {
+                while (usrIn != "q" && !selectValid) {
+                    std::cout << turn << " to move (select destination) | 'q' to reselect piece: ";
+                    std::cin >> usrIn;
+
+                    if (usrIn != "q") {
+                        parse = parseInput(usrIn);
+
+                        if (parse != -1) {
+                            int destCol = parse / 10;
+                            int destRow = parse % 10;
+
+                            if (board[usrCol][usrRow] -> move(destCol, destRow)) {
+                                selectValid = true;
+                                printBoard();
+                            }
+                        }
+                    }
+                }
+            }
+            else
+                std::cout << "Piece isn't a member of the side that is moving\n";
+        }
+    }
+}
+
+int main() {
+    addNulls();
     printBoard();
+
+    while (true) {
+
+        toPlay(turn);
+        turn = (turn == 'B') ? 'W' : 'B';
+    }
+
     return 0;
 }
