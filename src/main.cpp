@@ -4,14 +4,12 @@ char turn = 'W';
 int moveMatrix[8][8];
 
 void resetMoveset() {
-
     for (int i = 0; i < 8; i++)
         for (int j = 0; j < 8; j++)
             moveMatrix[j][i] = 0;
 }
 
 void printMoveset() {
-
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++)
             std::cout << moveMatrix[j][i] << " ";
@@ -27,7 +25,6 @@ private:
     int col;
     bool ingame; 
     bool moved;
-
 public:
     char getid();
     char getside();
@@ -43,6 +40,7 @@ public:
     void setingame(bool arg);
     void setmoved(bool arg);
     virtual bool move(int arg1, int arg2);
+    virtual void gatherMatrix();
 
     Piece();
 };
@@ -71,6 +69,7 @@ void Piece::setingame(bool arg) { this -> ingame = arg; }
 void Piece::setmoved(bool arg) { this -> moved = arg; }
 
 bool Piece::move(int arg1, int arg2) { std::cout<<"This piece is not in the game"<<std::endl; return false; }
+void Piece::gatherMatrix() { return; }
 
 Piece *board[8][8];
 Piece *ptrPce;
@@ -169,7 +168,6 @@ void Pawn::gatherMatrix() {
 }
 
 bool Pawn::move(int col, int row) {
-
     if (col > 7 || col < 0 || row > 7 || row < 0) {
         std::cout << "Invalid move" << std::endl;
         return false;
@@ -210,7 +208,6 @@ Knight::Knight(char side, int col, int row) {
 }
 
 void Knight::gatherMatrix() {
-
     int colTile, rowTile;
 
     // l2d1
@@ -311,7 +308,6 @@ void Knight::gatherMatrix() {
 }
 
 bool Knight::move(int col, int row) {
-
     if (col > 7 || col < 0 || row > 7 || row < 0) {
         std::cout << "Invalid move" << std::endl;
         return false;
@@ -352,7 +348,6 @@ Bishop::Bishop(char side, int col, int row) {
 }
 
 void Bishop::gatherMatrix() {
-
     int colTile, rowTile;
 
     // left down
@@ -421,7 +416,6 @@ void Bishop::gatherMatrix() {
 }
 
 bool Bishop::move(int col, int row) {
-
     if (col > 7 || col < 0 || row > 7 || row < 0) {
         std::cout << "Invalid move" << std::endl;
         return false;
@@ -462,7 +456,6 @@ Rook::Rook(char side, int col, int row) {
 }
 
 void Rook::gatherMatrix() {
-
     int tile;
     
     // left columns
@@ -519,7 +512,6 @@ void Rook::gatherMatrix() {
 }
 
 bool Rook::move(int col, int row) {
-
     if (col > 7 || col < 0 || row > 7 || row < 0) {
         std::cout << "Invalid move" << std::endl;
         return false;
@@ -560,7 +552,6 @@ Queen::Queen(char side, int col, int row) {
 }
 
 void Queen::gatherMatrix() {
-
     int colTile, rowTile;
 
     // left down
@@ -692,7 +683,6 @@ void Queen::gatherMatrix() {
 }
 
 bool Queen::move(int col, int row) {
-
     if (col > 7 || col < 0 || row > 7 || row < 0) {
         std::cout << "Invalid move" << std::endl;
         return false;
@@ -733,7 +723,6 @@ King::King(char side, int col, int row) {
 }
 
 void King::gatherMatrix() {
-
     int colTile, rowTile;
 
     // left
@@ -834,7 +823,6 @@ void King::gatherMatrix() {
 }
 
 bool King::move(int col, int row) {
-
     if (col > 7 || col < 0 || row > 7 || row < 0) {
         std::cout << "Invalid move" << std::endl;
         return false;
@@ -859,7 +847,7 @@ bool King::move(int col, int row) {
         board[col][row] = this;
         return true;
     }
-    
+
     std::cout << "Can't move there" << std::endl;
     return false;
 }
@@ -906,12 +894,15 @@ void addNulls() {
 
 void printBoard() {
     for (int i = 0; i < 8; i++) {
+        std::cout << 8 - i << " | ";
         for (int j = 0; j < 8; j++) {
             ptrPce = board[j][i];
             std::cout << ptrPce -> getid() << " ";
         }
-        std::cout<<std::endl;
+        std::cout << std::endl;
     }
+    std::cout << "  |_________________" << std::endl;
+    std::cout << "    A B C D E F G H" << std::endl;
 }
 
 int parseInput(std::string str) {
@@ -930,58 +921,21 @@ int parseInput(std::string str) {
     return (col * 10) + row;
 }
 
-// void toPlay(char turn) {
-
-//     int usrCol = -1, usrRow = -1, parse;
-//     bool selectValid = false;
-    
-//     while (!selectValid) {
-
-//         std::cout << turn << " to move (select piece): ";
-    
-//         std::string usrIn;
-//         std::cin >> usrIn;
-
-//         parse = parseInput(usrIn);
-
-//         if (parse != -1) {
-//             usrCol = parse / 10;
-//             usrRow = parse % 10;
-
-//             if (board[usrCol][usrRow] -> getside() == turn) {
-//                 while (usrIn != "q" && !selectValid) {
-//                     std::cout << turn << " to move (select destination) | 'q' to reselect piece: ";
-//                     std::cin >> usrIn;
-
-//                     if (usrIn != "q") {
-//                         parse = parseInput(usrIn);
-
-//                         if (parse != -1) {
-//                             int destCol = parse / 10;
-//                             int destRow = parse % 10;
-
-//                             if (board[usrCol][usrRow] -> move(destCol, destRow)) {
-//                                 selectValid = true;
-//                                 printBoard();
-//                             }
-//                         }
-//                     }
-//                 }
-//             }
-//             else
-//                 std::cout << "Piece isn't a member of the side that is moving\n";
-//         }
-//     }
-// }
-
 void toPlay() {
-
-    std::cout << turn << " to move (format d2d4): ";
+    // format: d2d4
+    std::cout << turn << " to move: ";
     
     std::string input;
     std::cin >> input;
+
+    if (input.length() != 4)
+        toPlay();
+
     int start = parseInput(input.substr(0, 2));
     int end = parseInput(input.substr(2, 2));
+
+    if (start == -1 || end == -1)
+        toPlay();
 
     int startCol = start / 10;
     int startRow = start % 10;
@@ -989,25 +943,25 @@ void toPlay() {
     int endCol = end / 10;
     int endRow = end % 10;
 
-    // if board[start] matches color of turn, and board[end] is a valid destination, then move there, otherwise recall the function
-    // requires getMoveMatrix function for pieces
+    if (board[startCol][startRow] -> getside() == turn) {
+        board[startCol][startRow] -> gatherMatrix();
 
-    // additionally centralize move method
+        if (moveMatrix[endCol][endRow] != 0) {
+            board[startCol][startRow] -> move(endCol, endRow);
+            turn = (turn == 'B') ? 'W' : 'B';
+            return;
+        }
+    }
+    toPlay();
 }
 
 int main() {
     addNulls();
     printBoard();
 
-    board[3][6] ->move(3, 4);
-
-    printBoard();
-
-    // while (true) {
-
-    //     toPlay();
-    //     turn = (turn == 'B') ? 'W' : 'B';
-    // }
-
+    while (true) {
+        toPlay();
+        printBoard();
+    }
     return 0;
 }
