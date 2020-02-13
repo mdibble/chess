@@ -1,6 +1,23 @@
 #include <iostream>
 
 char turn = 'W';
+int moveMatrix[8][8];
+
+void resetMoveset() {
+
+    for (int i = 0; i < 8; i++)
+        for (int j = 0; j < 8; j++)
+            moveMatrix[j][i] = 0;
+}
+
+void printMoveset() {
+
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++)
+            std::cout << moveMatrix[j][i] << " ";
+        std::cout << std::endl;
+    }
+}
 
 class Piece {
 private:
@@ -31,7 +48,7 @@ public:
 };
 
 Piece::Piece() {
-    this -> setid('X');
+    this -> setid('-');
     this -> setside('X');
     this -> setcol(-1);
     this -> setrow(-1);
@@ -62,36 +79,42 @@ Piece *nullPiece = new Piece();
 class Pawn: public Piece {
 public:
     bool move(int col, int row);
+    void gatherMatrix();
     Pawn(char side, int col, int row);
 };
 
 class Knight: public Piece {
 public:
     bool move(int col, int row);
+    void gatherMatrix();
     Knight(char side, int col, int row);
 };
 
 class Bishop: public Piece {
 public:
     bool move(int col, int row);
+    void gatherMatrix();
     Bishop(char side, int col, int row);
 };
 
 class Rook: public Piece {
 public:
     bool move(int col, int row);
+    void gatherMatrix();
     Rook(char side, int col, int row);
 };
 
 class Queen: public Piece {
 public:
     bool move(int col, int row);
+    void gatherMatrix();
     Queen(char side, int col, int row);
 };
 
 class King: public Piece {
 public:
     bool move(int col, int row);
+    void gatherMatrix();
     King(char side, int col, int row);
 };
 
@@ -105,6 +128,46 @@ Pawn::Pawn(char side, int col, int row) {
     board[col][row] = this;
 }
 
+void Pawn::gatherMatrix() {
+    if (this -> getside() == 'W') {
+
+        // forward one
+        if (this -> getrow() != 0 && board[this -> getcol()][this -> getrow() - 1] == nullPiece)
+            moveMatrix[this -> getcol()][this -> getrow() - 1] = 1;
+
+        // forward two
+        if (this -> getmoved() == false && board[this -> getcol()][this -> getrow() - 2] == nullPiece)
+            moveMatrix[this -> getcol()][this -> getrow() - 2] = 1;
+
+        // take left 
+        if (this -> getrow() != 0 && board[this -> getcol() - 1][this -> getrow() - 1] -> getside() == 'B')
+            moveMatrix[this -> getcol() - 1][this -> getrow() - 1] = 2;
+
+        // take right
+        if (this -> getrow() != 0 && board[this -> getcol() + 1][this -> getrow() - 1] -> getside() == 'B')
+            moveMatrix[this -> getcol() + 1][this -> getrow() - 1] = 2;
+    }
+
+    else if (this -> getside() == 'B') {
+
+        // forward one
+        if (this -> getrow() != 7 && board[this -> getcol()][this -> getrow() + 1] == nullPiece)
+            moveMatrix[this -> getcol()][this -> getrow() + 1] = 1;
+
+        // forward two
+        if (this -> getmoved() == false && board[this -> getcol()][this -> getrow() + 2] == nullPiece)
+            moveMatrix[this -> getcol()][this -> getrow() + 2] = 1;
+
+        // take left 
+        if (this -> getrow() != 7 && board[this -> getcol() - 1][this -> getrow() + 1] -> getside() == 'W')
+            moveMatrix[this -> getcol() - 1][this -> getrow() + 1] = 2;
+
+        // take right
+        if (this -> getrow() != 7 && board[this -> getcol() + 1][this -> getrow() + 1] -> getside() == 'W')
+            moveMatrix[this -> getcol() + 1][this -> getrow() + 1] = 2;
+    }
+}
+
 bool Pawn::move(int col, int row) {
 
     if (col > 7 || col < 0 || row > 7 || row < 0) {
@@ -112,67 +175,11 @@ bool Pawn::move(int col, int row) {
         return false;
     }
 
-    // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
+    resetMoveset();
+    gatherMatrix();
+    printMoveset();
 
-    int validMoveset[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0}};
-
-    // white pawns
-
-    if (this -> getside() == 'W') {
-
-        // forward one
-        if (this -> getrow() != 0 && board[this -> getcol()][this -> getrow() - 1] == nullPiece)
-            validMoveset[this -> getcol()][this -> getrow() - 1] = 1;
-
-        // forward two
-        if (this -> getmoved() == false && board[this -> getcol()][this -> getrow() - 2] == nullPiece)
-            validMoveset[this -> getcol()][this -> getrow() - 2] = 1;
-
-        // take left 
-        if (this -> getrow() != 0 && board[this -> getcol() - 1][this -> getrow() - 1] -> getside() == 'B')
-            validMoveset[this -> getcol() - 1][this -> getrow() - 1] = 2;
-
-        // take right
-        if (this -> getrow() != 0 && board[this -> getcol() + 1][this -> getrow() - 1] -> getside() == 'B')
-            validMoveset[this -> getcol() + 1][this -> getrow() - 1] = 2;
-    }
-
-    // black pawns
-
-    else if (this -> getside() == 'B') {
-
-        // forward one
-        if (this -> getrow() != 7 && board[this -> getcol()][this -> getrow() + 1] == nullPiece)
-            validMoveset[this -> getcol()][this -> getrow() + 1] = 1;
-
-        // forward two
-        if (this -> getmoved() == false && board[this -> getcol()][this -> getrow() + 2] == nullPiece)
-            validMoveset[this -> getcol()][this -> getrow() + 2] = 1;
-
-        // take left 
-        if (this -> getrow() != 7 && board[this -> getcol() - 1][this -> getrow() + 1] -> getside() == 'W')
-            validMoveset[this -> getcol() - 1][this -> getrow() + 1] = 2;
-
-        // take right
-        if (this -> getrow() != 7 && board[this -> getcol() + 1][this -> getrow() + 1] -> getside() == 'W')
-            validMoveset[this -> getcol() + 1][this -> getrow() + 1] = 2;
-    }
-
-    // print moveset
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++)
-            std::cout<<validMoveset[j][i]<<" ";
-        std::cout<<std::endl;
-    }
-
-    if (validMoveset[col][row] != 0) {
+    if (moveMatrix[col][row] != 0) {
         board[col][row] -> setingame(false);
 
         int tempCol = this -> getcol();
@@ -202,24 +209,8 @@ Knight::Knight(char side, int col, int row) {
     board[col][row] = this;
 }
 
-bool Knight::move(int col, int row) {
+void Knight::gatherMatrix() {
 
-    if (col > 7 || col < 0 || row > 7 || row < 0) {
-        std::cout << "Invalid move" << std::endl;
-        return false;
-    }
-
-    // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
-
-    int validMoveset[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0}};
-    
     int colTile, rowTile;
 
     // l2d1
@@ -228,10 +219,10 @@ bool Knight::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
     }
 
     // l2u1
@@ -240,10 +231,10 @@ bool Knight::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
     }
 
     // r2d1
@@ -252,10 +243,10 @@ bool Knight::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
     }
 
     // r2u1
@@ -264,10 +255,10 @@ bool Knight::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
     }
 
     // u2l1
@@ -276,10 +267,10 @@ bool Knight::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
     }
 
     // u2r1
@@ -288,10 +279,10 @@ bool Knight::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
     }
 
     // d2l1
@@ -300,10 +291,10 @@ bool Knight::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
     }
 
     // d2r1
@@ -312,20 +303,25 @@ bool Knight::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
+    }
+}
+
+bool Knight::move(int col, int row) {
+
+    if (col > 7 || col < 0 || row > 7 || row < 0) {
+        std::cout << "Invalid move" << std::endl;
+        return false;
     }
 
-    // print moveset
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++)
-            std::cout<<validMoveset[j][i]<<" ";
-        std::cout<<std::endl;
-    }
+    resetMoveset();
+    gatherMatrix();
+    printMoveset();
 
-    if (validMoveset[col][row] != 0) {
+    if (moveMatrix[col][row] != 0) {
         board[col][row] -> setingame(false);
 
         int tempCol = this -> getcol();
@@ -355,24 +351,8 @@ Bishop::Bishop(char side, int col, int row) {
     board[col][row] = this;
 }
 
-bool Bishop::move(int col, int row) {
+void Bishop::gatherMatrix() {
 
-    if (col > 7 || col < 0 || row > 7 || row < 0) {
-        std::cout << "Invalid move" << std::endl;
-        return false;
-    }
-
-    // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
-
-    int validMoveset[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0}};
-    
     int colTile, rowTile;
 
     // left down
@@ -381,10 +361,10 @@ bool Bishop::move(int col, int row) {
 
     while (colTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside()) {
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
             break;
         }
         colTile--;
@@ -397,10 +377,10 @@ bool Bishop::move(int col, int row) {
 
     while (colTile >= 0 && rowTile >= 0) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside()) {
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
             break;
         }
         colTile--;
@@ -413,10 +393,10 @@ bool Bishop::move(int col, int row) {
 
     while (colTile <= 7 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside()) {
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
             break;
         }
         colTile++;
@@ -429,24 +409,29 @@ bool Bishop::move(int col, int row) {
 
     while (colTile <= 7 && rowTile >= 0) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside()) {
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
             break;
         }
         colTile++;
         rowTile--;
     }
+}
 
-    // print moveset
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++)
-            std::cout<<validMoveset[j][i]<<" ";
-        std::cout<<std::endl;
+bool Bishop::move(int col, int row) {
+
+    if (col > 7 || col < 0 || row > 7 || row < 0) {
+        std::cout << "Invalid move" << std::endl;
+        return false;
     }
 
-    if (validMoveset[col][row] != 0) {
+    resetMoveset();
+    gatherMatrix();
+    printMoveset();
+
+    if (moveMatrix[col][row] != 0) {
         board[col][row] -> setingame(false);
 
         int tempCol = this -> getcol();
@@ -476,23 +461,7 @@ Rook::Rook(char side, int col, int row) {
     board[col][row] = this;
 }
 
-bool Rook::move(int col, int row) {
-
-    if (col > 7 || col < 0 || row > 7 || row < 0) {
-        std::cout << "Invalid move" << std::endl;
-        return false;
-    }
-
-    // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
-
-    int validMoveset[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0}};
+void Rook::gatherMatrix() {
 
     int tile;
     
@@ -500,10 +469,10 @@ bool Rook::move(int col, int row) {
     tile = this -> getcol();
     while (tile >= 0) {
         if (board[tile][this -> getrow()] == nullPiece)
-            validMoveset[tile][this -> getrow()] = 1;
+            moveMatrix[tile][this -> getrow()] = 1;
 
         else if (board[tile][this -> getrow()] -> getside() != this -> getside()) {
-            validMoveset[tile][this -> getrow()] = 2;
+            moveMatrix[tile][this -> getrow()] = 2;
             break;
         }
         tile--;
@@ -513,10 +482,10 @@ bool Rook::move(int col, int row) {
     tile = this -> getcol();
     while (tile <= 7) {
         if (board[tile][this -> getrow()] == nullPiece)
-            validMoveset[tile][this -> getrow()] = 1;
+            moveMatrix[tile][this -> getrow()] = 1;
 
         else if (board[tile][this -> getrow()] -> getside() != this -> getside()) {
-            validMoveset[tile][this -> getrow()] = 2;
+            moveMatrix[tile][this -> getrow()] = 2;
             break;
         }
         tile++;
@@ -526,10 +495,10 @@ bool Rook::move(int col, int row) {
     tile = this -> getrow();
     while (tile >= 0) {
         if (board[this -> getcol()][tile] == nullPiece)
-            validMoveset[this -> getcol()][tile] = 1;
+            moveMatrix[this -> getcol()][tile] = 1;
 
         else if (board[this -> getcol()][tile] -> getside() != this -> getside()) {
-            validMoveset[this -> getcol()][tile] = 2;
+            moveMatrix[this -> getcol()][tile] = 2;
             break;
         }
         tile--;
@@ -539,23 +508,28 @@ bool Rook::move(int col, int row) {
     tile = this -> getrow();
     while (tile <= 7) {
         if (board[this -> getcol()][tile] == nullPiece)
-            validMoveset[this -> getcol()][tile] = 1;
+            moveMatrix[this -> getcol()][tile] = 1;
 
         else if (board[this -> getcol()][tile] -> getside() != this -> getside()) {
-            validMoveset[this -> getcol()][tile] = 2;
+            moveMatrix[this -> getcol()][tile] = 2;
             break;
         }
         tile++;
     }
+}
 
-    // print moveset
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++)
-            std::cout<<validMoveset[j][i]<<" ";
-        std::cout<<std::endl;
+bool Rook::move(int col, int row) {
+
+    if (col > 7 || col < 0 || row > 7 || row < 0) {
+        std::cout << "Invalid move" << std::endl;
+        return false;
     }
 
-    if (validMoveset[col][row] != 0) {
+    resetMoveset();
+    gatherMatrix();
+    printMoveset();
+
+    if (moveMatrix[col][row] != 0) {
         board[col][row] -> setingame(false);
 
         int tempCol = this -> getcol();
@@ -585,24 +559,8 @@ Queen::Queen(char side, int col, int row) {
     board[col][row] = this;
 }
 
-bool Queen::move(int col, int row) {
+void Queen::gatherMatrix() {
 
-    if (col > 7 || col < 0 || row > 7 || row < 0) {
-        std::cout << "Invalid move" << std::endl;
-        return false;
-    }
-
-    // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
-
-    int validMoveset[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0}};
-    
     int colTile, rowTile;
 
     // left down
@@ -611,10 +569,10 @@ bool Queen::move(int col, int row) {
 
     while (colTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside()) {
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
             break;
         }
         colTile--;
@@ -627,10 +585,10 @@ bool Queen::move(int col, int row) {
 
     while (colTile >= 0 && rowTile >= 0) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside()) {
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
             break;
         }
         colTile--;
@@ -643,10 +601,10 @@ bool Queen::move(int col, int row) {
 
     while (colTile <= 7 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside()) {
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
             break;
         }
         colTile++;
@@ -659,10 +617,10 @@ bool Queen::move(int col, int row) {
 
     while (colTile <= 7 && rowTile >= 0) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside()) {
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
             break;
         }
         colTile++;
@@ -676,10 +634,10 @@ bool Queen::move(int col, int row) {
 
     while (colTile >= 0) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside()) {
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
             break;
         }
         colTile--;
@@ -692,10 +650,10 @@ bool Queen::move(int col, int row) {
 
     while (colTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside()) {
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
             break;
         }
         colTile++;
@@ -707,10 +665,10 @@ bool Queen::move(int col, int row) {
 
     while (rowTile >= 0) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside()) {
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
             break;
         }
         rowTile--;
@@ -723,23 +681,28 @@ bool Queen::move(int col, int row) {
 
     while (rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside()) {
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
             break;
         }
         rowTile++;
     }
+}
 
-    // print moveset
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++)
-            std::cout<<validMoveset[j][i]<<" ";
-        std::cout<<std::endl;
+bool Queen::move(int col, int row) {
+
+    if (col > 7 || col < 0 || row > 7 || row < 0) {
+        std::cout << "Invalid move" << std::endl;
+        return false;
     }
 
-    if (validMoveset[col][row] != 0) {
+    resetMoveset();
+    gatherMatrix();
+    printMoveset();
+
+    if (moveMatrix[col][row] != 0) {
         board[col][row] -> setingame(false);
 
         int tempCol = this -> getcol();
@@ -769,24 +732,8 @@ King::King(char side, int col, int row) {
     board[col][row] = this;
 }
 
-bool King::move(int col, int row) {
+void King::gatherMatrix() {
 
-    if (col > 7 || col < 0 || row > 7 || row < 0) {
-        std::cout << "Invalid move" << std::endl;
-        return false;
-    }
-
-    // moveset where 1 indicates moveable, 2 indicates takeable, maybe other implementations
-
-    int validMoveset[8][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0}};
-    
     int colTile, rowTile;
 
     // left
@@ -795,10 +742,10 @@ bool King::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
     }
 
     // right
@@ -807,10 +754,10 @@ bool King::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
     }
 
     // up
@@ -819,10 +766,10 @@ bool King::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
     }
 
     // down
@@ -831,10 +778,10 @@ bool King::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
     }
 
     // left up
@@ -843,10 +790,10 @@ bool King::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
     }
 
     // left down
@@ -855,10 +802,10 @@ bool King::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
     }
 
     // right up
@@ -867,10 +814,10 @@ bool King::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
     }
 
     // right down
@@ -879,20 +826,25 @@ bool King::move(int col, int row) {
 
     if (colTile >= 0 && colTile <= 7 && rowTile >= 0 && rowTile <= 7) {
         if (board[colTile][rowTile] == nullPiece)
-            validMoveset[colTile][rowTile] = 1;
+            moveMatrix[colTile][rowTile] = 1;
 
         else if (board[colTile][rowTile] -> getside() != this -> getside())
-            validMoveset[colTile][rowTile] = 2;
+            moveMatrix[colTile][rowTile] = 2;
+    }
+}
+
+bool King::move(int col, int row) {
+
+    if (col > 7 || col < 0 || row > 7 || row < 0) {
+        std::cout << "Invalid move" << std::endl;
+        return false;
     }
 
-    // print moveset
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++)
-            std::cout<<validMoveset[j][i]<<" ";
-        std::cout<<std::endl;
-    }
+    resetMoveset();
+    gatherMatrix();
+    printMoveset();
 
-    if (validMoveset[col][row] != 0) {
+    if (moveMatrix[col][row] != 0) {
         board[col][row] -> setingame(false);
 
         int tempCol = this -> getcol();
@@ -978,59 +930,84 @@ int parseInput(std::string str) {
     return (col * 10) + row;
 }
 
-void toPlay(char turn) {
+// void toPlay(char turn) {
 
-    int usrCol = -1, usrRow = -1, parse;
-    bool selectValid = false;
+//     int usrCol = -1, usrRow = -1, parse;
+//     bool selectValid = false;
     
-    while (!selectValid) {
+//     while (!selectValid) {
 
-        std::cout << turn << " to move (select piece): ";
+//         std::cout << turn << " to move (select piece): ";
     
-        std::string usrIn;
-        std::cin >> usrIn;
+//         std::string usrIn;
+//         std::cin >> usrIn;
 
-        parse = parseInput(usrIn);
+//         parse = parseInput(usrIn);
 
-        if (parse != -1) {
-            usrCol = parse / 10;
-            usrRow = parse % 10;
+//         if (parse != -1) {
+//             usrCol = parse / 10;
+//             usrRow = parse % 10;
 
-            if (board[usrCol][usrRow] -> getside() == turn) {
-                while (usrIn != "q" && !selectValid) {
-                    std::cout << turn << " to move (select destination) | 'q' to reselect piece: ";
-                    std::cin >> usrIn;
+//             if (board[usrCol][usrRow] -> getside() == turn) {
+//                 while (usrIn != "q" && !selectValid) {
+//                     std::cout << turn << " to move (select destination) | 'q' to reselect piece: ";
+//                     std::cin >> usrIn;
 
-                    if (usrIn != "q") {
-                        parse = parseInput(usrIn);
+//                     if (usrIn != "q") {
+//                         parse = parseInput(usrIn);
 
-                        if (parse != -1) {
-                            int destCol = parse / 10;
-                            int destRow = parse % 10;
+//                         if (parse != -1) {
+//                             int destCol = parse / 10;
+//                             int destRow = parse % 10;
 
-                            if (board[usrCol][usrRow] -> move(destCol, destRow)) {
-                                selectValid = true;
-                                printBoard();
-                            }
-                        }
-                    }
-                }
-            }
-            else
-                std::cout << "Piece isn't a member of the side that is moving\n";
-        }
-    }
+//                             if (board[usrCol][usrRow] -> move(destCol, destRow)) {
+//                                 selectValid = true;
+//                                 printBoard();
+//                             }
+//                         }
+//                     }
+//                 }
+//             }
+//             else
+//                 std::cout << "Piece isn't a member of the side that is moving\n";
+//         }
+//     }
+// }
+
+void toPlay() {
+
+    std::cout << turn << " to move (format d2d4): ";
+    
+    std::string input;
+    std::cin >> input;
+    int start = parseInput(input.substr(0, 2));
+    int end = parseInput(input.substr(2, 2));
+
+    int startCol = start / 10;
+    int startRow = start % 10;
+
+    int endCol = end / 10;
+    int endRow = end % 10;
+
+    // if board[start] matches color of turn, and board[end] is a valid destination, then move there, otherwise recall the function
+    // requires getMoveMatrix function for pieces
+
+    // additionally centralize move method
 }
 
 int main() {
     addNulls();
     printBoard();
 
-    while (true) {
+    board[3][6] ->move(3, 4);
 
-        toPlay(turn);
-        turn = (turn == 'B') ? 'W' : 'B';
-    }
+    printBoard();
+
+    // while (true) {
+
+    //     toPlay();
+    //     turn = (turn == 'B') ? 'W' : 'B';
+    // }
 
     return 0;
 }
