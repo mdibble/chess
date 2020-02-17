@@ -3,6 +3,7 @@
 char turn = 'W';
 char check = 'N';
 int moveMatrix[8][8];
+bool inPlay = true;
 
 void resetMoveset() {
     for (int i = 0; i < 8; i++)
@@ -875,13 +876,87 @@ char checkStatus() {
     return 'N';
 }
 
+bool checkmateDetect() {
+
+    char sideThreatened = check;
+    int movesForPiece[8][8];
+
+    std::cout << "sideThreatened has been set to " << sideThreatened << " from " << check << std::endl;
+    
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+
+            if (board[j][i] -> getside() == sideThreatened) {
+
+                std::cout << j << ", " << i << " must be tested" << std::endl;
+                for (int k = 0; k < 8; k++)
+                    for (int l = 0; l < 8; l++)
+                        movesForPiece[l][k] = 0;
+
+                resetMoveset();
+                board[j][i] -> gatherMatrix();
+
+                for (int k = 0; k < 8; k++)
+                    for (int l = 0; l < 8; l++) {
+                        movesForPiece[l][k] = moveMatrix[l][k];
+                    }
+
+                for (int k = 0; k < 8; k++)
+                    for (int l = 0; l < 8; l++) {
+                        
+                        if (movesForPiece[l][k] != 0) {
+
+                            int startCol = j;
+                            int startRow = i;
+
+                            int endCol = l;
+                            int endRow = k;
+
+                            resetMoveset();
+                            board[startCol][startRow] -> gatherMatrix();
+
+                            Piece *restoreBoard[8][8];
+
+                            for (int i = 0; i < 8; i++)
+                                for (int j = 0; j < 8; j++)
+                                    restoreBoard[j][i] = board[j][i];
+
+                            board[startCol][startRow] -> moveSoft(endCol, endRow);
+
+                            check = checkStatus();
+
+                            for (int i = 0; i < 8; i++)
+                                for (int j = 0; j < 8; j++)
+                                    board[j][i] = restoreBoard[j][i];
+
+                            board[startCol][startRow] -> setcol(startCol);
+                            board[startCol][startRow] -> setrow(startRow);
+
+                            if (board[endCol][endRow] != nullPiece) {
+                                board[endCol][endRow] -> setcol(endCol);
+                                board[endCol][endRow] -> setrow(endRow);
+                            }
+
+                            if (check != turn) {
+                                return false;
+                            }
+                        }
+                    }
+            }
+        }
+    }
+
+    return true;
+}
+
 void toPlay() {
 
-    // check if the user is in check
-    // if they are, gather the moveset of the king
-    // if all the spots in the moveset in the king
-    // can be occupied by opponent pieces, the game
-    // is over.
+    if (check != 'N')
+        if (checkmateDetect()) {
+            std:: cout << "Checkmate: " << check << " lost!" << std::endl;
+            inPlay = false;
+            return;    
+        }
 
     // format: d2d4
     std::cout << turn << " to move: ";
@@ -945,7 +1020,7 @@ void toPlay() {
                 }
                     
                 else {
-                    std::cout << "No longer in check" << std::endl;\
+                    std::cout << "No longer in check" << std::endl;
                     resetMoveset();
                     board[startCol][startRow] -> gatherMatrix();
                     board[startCol][startRow] -> move(endCol, endRow);
@@ -959,6 +1034,7 @@ void toPlay() {
             }            
 
             turn = (turn == 'B') ? 'W' : 'B';
+            check = checkStatus();
             return;
         }
     }
@@ -967,14 +1043,12 @@ void toPlay() {
 
 int main() {
     addNulls();
-    printBoard();
 
-    while (true) {
-        toPlay();
+    while (inPlay) {
         printBoard();
-
-        check = checkStatus();
         std::cout << "In check? " << check << std::endl;
+        toPlay();
+
     }
 
     return 0;
