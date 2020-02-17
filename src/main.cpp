@@ -41,6 +41,7 @@ public:
     void setingame(bool arg);
     void setmoved(bool arg);
     virtual bool move(int arg1, int arg2);
+    virtual bool moveSoft(int arg1, int arg2);
     virtual void gatherMatrix();
 
     Piece();
@@ -81,7 +82,13 @@ bool Piece::move(int col, int row) {
         return false;
     }
 
-    if (moveMatrix[col][row] != 0) {
+    if (board[col][row] -> getid() == 'K') {
+
+        std::cout << "Can't capture a king" << std::endl;
+        return false;
+    }
+
+    if (moveMatrix[col][row] != 0 && moveMatrix[col][row]) {
         board[col][row] -> setingame(false);
 
         int tempCol = this -> getcol();
@@ -91,6 +98,28 @@ bool Piece::move(int col, int row) {
 
         if (this -> getmoved() == false)
             this -> setmoved(true);
+
+        board[tempCol][tempRow] = nullPiece;
+        board[col][row] = this;
+        return true;
+    }
+    
+    std::cout << "Can't move there" << std::endl;
+    return false;
+}
+
+bool Piece::moveSoft(int col, int row) {
+    if (col > 7 || col < 0 || row > 7 || row < 0) {
+        std::cout << "Invalid move" << std::endl;
+        return false;
+    }
+
+    if (moveMatrix[col][row] != 0) {
+
+        int tempCol = this -> getcol();
+        int tempRow = this -> getrow();
+        this -> setcol(col);
+        this -> setrow(row);
 
         board[tempCol][tempRow] = nullPiece;
         board[col][row] = this;
@@ -880,36 +909,50 @@ void toPlay() {
         board[startCol][startRow] -> gatherMatrix();
 
         if (moveMatrix[endCol][endRow] != 0) {
-
-            // see if the move puts them out of check, if it does: do it
-            // otherwise, tell the user it doesn't and recall the function
-
             check = checkStatus();
 
             if (check == turn) {
-
-                // if they're in check
-
                 std::cout << "In check" << std::endl;
 
                 resetMoveset();
                 board[startCol][startRow] -> gatherMatrix();
-                board[startCol][startRow] -> move(endCol, endRow);
+
+                Piece *restoreBoard[8][8];
+
+                for (int i = 0; i < 8; i++)
+                    for (int j = 0; j < 8; j++)
+                        restoreBoard[j][i] = board[j][i];
+
+                board[startCol][startRow] -> moveSoft(endCol, endRow);
 
                 check = checkStatus();
 
-                if (check == turn)
-                    std::cout << "Still in check" << std::endl;
+                for (int i = 0; i < 8; i++)
+                    for (int j = 0; j < 8; j++)
+                        board[j][i] = restoreBoard[j][i];
 
-                else
-                    std::cout << "No longer in check" << std::endl;
+                board[startCol][startRow] -> setcol(startCol);
+                board[startCol][startRow] -> setrow(startRow);
+
+                if (board[endCol][endRow] != nullPiece) {
+                    board[endCol][endRow] -> setcol(endCol);
+                    board[endCol][endRow] -> setrow(endRow);
+                }
+
+                if (check == turn) {
+                    std::cout << "Still in check" << std::endl;
+                    toPlay();
+                }
                     
-                // also: add a board to restore to if the move ends up not removing check
+                else {
+                    std::cout << "No longer in check" << std::endl;\
+                    resetMoveset();
+                    board[startCol][startRow] -> gatherMatrix();
+                    board[startCol][startRow] -> move(endCol, endRow);
+                }
             }
 
             else {
-
-                // if they're not in check
                 resetMoveset();
                 board[startCol][startRow] -> gatherMatrix();
                 board[startCol][startRow] -> move(endCol, endRow);
@@ -932,8 +975,7 @@ int main() {
 
         check = checkStatus();
         std::cout << "In check? " << check << std::endl;
-
-        // add functionality so kings can't be captured (3)
     }
+
     return 0;
 }
