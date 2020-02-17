@@ -805,37 +805,44 @@ int parseInput(std::string str) {
     return (col * 10) + row;
 }
 
-char checkStatus(char sideToTest) {
+char checkStatus() {
     int kingCol, kingRow; 
-    char sideToScan;
+    char sideToTest, sideToScan;
 
-    resetMoveset();
+    sideToTest = 'W';
+    sideToScan = 'B';
 
-    if (sideToTest == 'B')
-        sideToScan = 'W';
-    else if (sideToTest == 'W')
-        sideToScan = 'B';
+    while (sideToTest != 'X') {
 
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            if (board[j][i] -> getid() == 'K' && board[j][i] -> getside() == sideToTest) {
-                kingCol = j;
-                kingRow = i;
+        resetMoveset();
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (board[j][i] -> getid() == 'K' && board[j][i] -> getside() == sideToTest) {
+                    kingCol = j;
+                    kingRow = i;
+                }
             }
         }
+
+        for (int i = 0; i < 8; i++)
+            for (int j = 0; j < 8; j++)
+                if (board[j][i] -> getside() == sideToScan)
+                    board[j][i] -> gatherMatrix();
+
+        if (moveMatrix[kingCol][kingRow] != 0)
+            return sideToTest;
+
+        if (sideToTest == 'W') {
+            sideToTest = 'B';
+            sideToScan = 'W';
+        }
+
+        else
+            sideToTest = 'X';
     }
 
-    for (int i = 0; i < 8; i++)
-        for (int j = 0; j < 8; j++) {
-            if (board[j][i] -> getside() == sideToScan) {
-                board[j][i] -> gatherMatrix();
-            }
-                
-        }
-
-    if (moveMatrix[kingCol][kingRow] != 0)
-        return sideToTest;
-
+    resetMoveset();
     return 'N';
 }
 
@@ -877,7 +884,36 @@ void toPlay() {
             // see if the move puts them out of check, if it does: do it
             // otherwise, tell the user it doesn't and recall the function
 
-            board[startCol][startRow] -> move(endCol, endRow);
+            check = checkStatus();
+
+            if (check == turn) {
+
+                // if they're in check
+
+                std::cout << "In check" << std::endl;
+
+                resetMoveset();
+                board[startCol][startRow] -> gatherMatrix();
+                board[startCol][startRow] -> move(endCol, endRow);
+
+                check = checkStatus();
+
+                if (check == turn)
+                    std::cout << "Still in check" << std::endl;
+
+                else
+                    std::cout << "No longer in check" << std::endl;
+                    
+                // also: add a board to restore to if the move ends up not removing check
+            }
+
+            else {
+
+                // if they're not in check
+                resetMoveset();
+                board[startCol][startRow] -> gatherMatrix();
+                board[startCol][startRow] -> move(endCol, endRow);
+            }            
 
             turn = (turn == 'B') ? 'W' : 'B';
             return;
@@ -894,8 +930,10 @@ int main() {
         toPlay();
         printBoard();
 
-        check = checkStatus(turn);
+        check = checkStatus();
         std::cout << "In check? " << check << std::endl;
+
+        // add functionality so kings can't be captured (3)
     }
     return 0;
 }
