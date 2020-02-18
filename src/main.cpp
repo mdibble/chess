@@ -1034,7 +1034,7 @@ void toPlay() {
                 resetMoveset();
                 board[startCol][startRow] -> gatherMatrix();
                 board[startCol][startRow] -> move(endCol, endRow);
-            }            
+            }
 
             turn = (turn == 'B') ? 'W' : 'B';
             check = checkStatus();
