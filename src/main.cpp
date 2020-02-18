@@ -1,4 +1,5 @@
 #include <iostream>
+#include <SFML/Window.hpp>
 
 char turn = 'W';
 char check = 'N';
@@ -958,6 +959,8 @@ void toPlay() {
             return;    
         }
 
+    restart: 
+
     // format: d2d4
     std::cout << turn << " to move: ";
     
@@ -965,13 +968,13 @@ void toPlay() {
     std::cin >> input;
 
     if (input.length() != 4)
-        toPlay();
+        goto restart;
 
     int start = parseInput(input.substr(0, 2));
     int end = parseInput(input.substr(2, 2));
 
     if (start == -1 || end == -1)
-        toPlay();
+        goto restart;
 
     int startCol = start / 10;
     int startRow = start % 10;
@@ -1016,7 +1019,7 @@ void toPlay() {
 
                 if (check == turn) {
                     std::cout << "Still in check" << std::endl;
-                    toPlay();
+                    goto restart;
                 }
                     
                 else {
@@ -1038,7 +1041,7 @@ void toPlay() {
             return;
         }
     }
-    toPlay();
+    goto restart;
 }
 
 int main() {
@@ -1048,7 +1051,6 @@ int main() {
         printBoard();
         std::cout << "In check? " << check << std::endl;
         toPlay();
-
     }
 
     return 0;
