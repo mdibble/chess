@@ -45,6 +45,8 @@ public:
     virtual bool move(int arg1, int arg2);
     virtual bool moveSoft(int arg1, int arg2);
     virtual void gatherMatrix();
+    virtual bool getenPassant();
+    virtual void setenPassant(bool arg);
 
     Piece();
 };
@@ -71,6 +73,9 @@ void Piece::setrow(int arg) { this -> row = arg; }
 void Piece::setcol(int arg) { this -> col = arg; }
 void Piece::setingame(bool arg) { this -> ingame = arg; }
 void Piece::setmoved(bool arg) { this -> moved = arg; }
+
+bool Piece::getenPassant() { return false; }
+void Piece::setenPassant(bool arg) { return; }
 
 void Piece::gatherMatrix() { std::cout << "Test" << std::endl; return; }
 
@@ -100,8 +105,14 @@ bool Piece::move(int col, int row) {
         this -> setcol(col);
         this -> setrow(row);
 
-        if (this -> getmoved() == false)
+        if (this -> getmoved() == false) {
+
             this -> setmoved(true);
+
+            if (this -> getid() == 'P' && (col == 3 || col == 4))
+                this -> setenPassant(true);
+        }
+            
 
         board[tempCol][tempRow] = nullPiece;
         board[col][row] = this;
@@ -131,6 +142,14 @@ bool Piece::move(int col, int row) {
                 board[7][0] = nullPiece;
                 board[5][0] -> setmoved(true);
             }
+        }
+
+        else if (moveMatrix[col][row] == 4) {
+
+            int modifyer = (turn == 'W') ? 1 : -1;
+            std::cout << "En Passant" << std::endl;
+            board[col][row + modifyer] -> setingame(false);
+            board[col][row + modifyer] = nullPiece;
         }
 
         if (board[col][row] -> getid() == 'P' && (row == 0 || row == 7))
@@ -166,10 +185,18 @@ bool Piece::moveSoft(int col, int row) {
 }
 
 class Pawn: public Piece {
+private:
+    bool enPassant;
 public:
     void gatherMatrix();
+    bool getenPassant();
+    void setenPassant(bool set);
     Pawn(char side, int col, int row);
+
 };
+
+bool Pawn::getenPassant() { return this -> enPassant; }
+void Pawn::setenPassant(bool arg) { this -> enPassant = arg; }
 
 class Knight: public Piece {
 public:
@@ -224,6 +251,12 @@ void Pawn::gatherMatrix() {
 
         if (this -> getrow() != 0 && this -> getcol() != 7 && board[this -> getcol() + 1][this -> getrow() - 1] -> getside() == 'B')
             moveMatrix[this -> getcol() + 1][this -> getrow() - 1] = 2;
+
+        if (this -> getcol() != 0 && board[this -> getcol() - 1][this -> getrow()] -> getid() == 'P' && board[this -> getcol() - 1][this -> getrow()] -> getside() == 'B' && board[this -> getcol() - 1][this -> getrow()] -> getenPassant() == true)
+            moveMatrix[this -> getcol() - 1][this -> getrow() - 1] = 4;
+
+        if (this -> getcol() != 7 && board[this -> getcol() + 1][this -> getrow()] -> getid() == 'P' && board[this -> getcol() + 1][this -> getrow()] -> getside() == 'B' && board[this -> getcol() + 1][this -> getrow()] -> getenPassant() == true)
+            moveMatrix[this -> getcol() + 1][this -> getrow() - 1] = 4;
     }
 
     else if (this -> getside() == 'B') {
@@ -238,6 +271,12 @@ void Pawn::gatherMatrix() {
 
         if (this -> getrow() != 7 && this -> getcol() != 7 && board[this -> getcol() + 1][this -> getrow() + 1] -> getside() == 'W')
             moveMatrix[this -> getcol() + 1][this -> getrow() + 1] = 2;
+
+        if (this -> getcol() != 0 && board[this -> getcol() - 1][this -> getrow()] -> getid() == 'P' && board[this -> getcol() - 1][this -> getrow()] -> getside() == 'W' && board[this -> getcol() - 1][this -> getrow()] -> getenPassant() == true)
+            moveMatrix[this -> getcol() - 1][this -> getrow() + 1] = 4;
+
+        if (this -> getcol() != 7 && board[this -> getcol() + 1][this -> getrow()] -> getid() == 'P' && board[this -> getcol() + 1][this -> getrow()] -> getside() == 'W' && board[this -> getcol() + 1][this -> getrow()] -> getenPassant() == true)
+            moveMatrix[this -> getcol() + 1][this -> getrow() + 1] = 4;
     }
 }
 
@@ -799,7 +838,6 @@ void King::gatherMatrix() {
             moveMatrix[colTile][rowTile] = 2;
     }
 
-    // white castling
     if (this -> getmoved() == false && this -> getside() == 'W') {
 
         if (board[0][7] -> getid() == 'R' && board[0][7] -> getmoved() == false && board[1][7] == nullPiece && board[2][7] == nullPiece && board[3][7] == nullPiece)
@@ -808,7 +846,6 @@ void King::gatherMatrix() {
             moveMatrix[6][7] = 3;
     }
 
-    // black castling
     if (this -> getmoved() == false && this -> getside() == 'B') {
 
         if (board[0][0] -> getid() == 'R' && board[0][0] -> getmoved() == false && board[1][0] == nullPiece && board[2][0] == nullPiece && board[3][0] == nullPiece)
@@ -816,8 +853,6 @@ void King::gatherMatrix() {
         if (board[7][0] -> getid() == 'R' && board[7][0] -> getmoved() == false && board[6][0] == nullPiece && board[5][0] == nullPiece)
             moveMatrix[6][0] = 3;
     }
-
-    printMoveset();
 }
 
 void promotePawn(int col, int row) {
@@ -1100,6 +1135,12 @@ void toPlay() {
             }
 
             turn = (turn == 'B') ? 'W' : 'B';
+
+            for (int i = 0; i < 8; i++)
+                for (int j = 0; j < 8; j++)
+                    if (board[j][i] -> getid() == 'P' && board[j][i] -> getside() == turn)
+                        board[j][i] -> setenPassant(false);
+
             check = checkStatus();
             return;
         }
