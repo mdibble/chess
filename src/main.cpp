@@ -78,6 +78,8 @@ Piece *board[8][8];
 Piece *ptrPce;
 Piece *nullPiece = new Piece();
 
+void promotePawn(int col, int row);
+
 bool Piece::move(int col, int row) {
     if (col > 7 || col < 0 || row > 7 || row < 0) {
         std::cout << "Invalid move" << std::endl;
@@ -90,7 +92,7 @@ bool Piece::move(int col, int row) {
         return false;
     }
 
-    if (moveMatrix[col][row] != 0 && moveMatrix[col][row]) {
+    if (moveMatrix[col][row] != 0) {
         board[col][row] -> setingame(false);
 
         int tempCol = this -> getcol();
@@ -103,6 +105,37 @@ bool Piece::move(int col, int row) {
 
         board[tempCol][tempRow] = nullPiece;
         board[col][row] = this;
+
+        if (moveMatrix[col][row] == 3) {
+
+            if (col == 2 && row == 7) {
+                board[3][7] = board[0][7];
+                board[0][7] = nullPiece;
+                board[3][7] -> setmoved(true);
+            }
+
+            else if (col == 6 && row == 7) {
+                board[5][7] = board[7][7];
+                board[7][7] = nullPiece;
+                board[5][7] -> setmoved(true);
+            }
+
+            else if (col == 2 && row == 0) {
+                board[3][0] = board[0][0];
+                board[0][0] = nullPiece;
+                board[3][0] -> setmoved(true);
+            }
+
+            else if (col == 6 && row == 0) {
+                board[5][0] = board[7][0];
+                board[7][0] = nullPiece;
+                board[5][0] -> setmoved(true);
+            }
+        }
+
+        if (board[col][row] -> getid() == 'P' && (row == 0 || row == 7))
+            promotePawn(col, row);
+        
         return true;
     }
     
@@ -765,6 +798,36 @@ void King::gatherMatrix() {
         else if (board[colTile][rowTile] -> getside() != this -> getside())
             moveMatrix[colTile][rowTile] = 2;
     }
+
+    // white castling
+    if (this -> getmoved() == false && this -> getside() == 'W') {
+
+        if (board[0][7] -> getid() == 'R' && board[0][7] -> getmoved() == false && board[1][7] == nullPiece && board[2][7] == nullPiece && board[3][7] == nullPiece)
+            moveMatrix[2][7] = 3;
+        if (board[7][7] -> getid() == 'R' && board[7][7] -> getmoved() == false && board[6][7] == nullPiece && board[5][7] == nullPiece)
+            moveMatrix[6][7] = 3;
+    }
+
+    // black castling
+    if (this -> getmoved() == false && this -> getside() == 'B') {
+
+        if (board[0][0] -> getid() == 'R' && board[0][0] -> getmoved() == false && board[1][0] == nullPiece && board[2][0] == nullPiece && board[3][0] == nullPiece)
+            moveMatrix[2][0] = 3;
+        if (board[7][0] -> getid() == 'R' && board[7][0] -> getmoved() == false && board[6][0] == nullPiece && board[5][0] == nullPiece)
+            moveMatrix[6][0] = 3;
+    }
+
+    printMoveset();
+}
+
+void promotePawn(int col, int row) {
+
+
+    std::cout << "This is where you promote the pawn" << std::endl;
+    char side = board[col][row] -> getside();
+    board[col][row] = nullPiece;
+
+    board[col][row] = new Queen(side, col, row);
 }
 
 Piece *b_r1 = new Rook('B', 0, 0);
