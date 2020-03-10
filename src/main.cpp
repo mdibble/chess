@@ -87,13 +87,12 @@ void promotePawn(int col, int row);
 
 bool Piece::move(int col, int row) {
     if (col > 7 || col < 0 || row > 7 || row < 0) {
-        std::cout << "Invalid move" << std::endl;
+        //std::cout << "Invalid move" << std::endl;
         return false;
     }
 
     if (board[col][row] -> getid() == 'K') {
-
-        std::cout << "Can't capture a king" << std::endl;
+        //std::cout << "Can't capture a king" << std::endl;
         return false;
     }
 
@@ -147,7 +146,7 @@ bool Piece::move(int col, int row) {
         else if (moveMatrix[col][row] == 4) {
 
             int modifyer = (turn == 'W') ? 1 : -1;
-            std::cout << "En Passant" << std::endl;
+            //std::cout << "En Passant" << std::endl;
             board[col][row + modifyer] -> setingame(false);
             board[col][row + modifyer] = nullPiece;
         }
@@ -158,13 +157,13 @@ bool Piece::move(int col, int row) {
         return true;
     }
     
-    std::cout << "Can't move there" << std::endl;
+    //std::cout << "Can't move there" << std::endl;
     return false;
 }
 
 bool Piece::moveSoft(int col, int row) {
     if (col > 7 || col < 0 || row > 7 || row < 0) {
-        std::cout << "Invalid move" << std::endl;
+        //std::cout << "Invalid move" << std::endl;
         return false;
     }
 
@@ -180,7 +179,7 @@ bool Piece::moveSoft(int col, int row) {
         return true;
     }
     
-    std::cout << "Can't move there" << std::endl;
+    //std::cout << "Can't move there" << std::endl;
     return false;
 }
 
@@ -858,46 +857,29 @@ void King::gatherMatrix() {
 void promotePawn(int col, int row) {
 
 
-    std::cout << "This is where you promote the pawn" << std::endl;
+    //std::cout << "This is where you promote the pawn" << std::endl;
     char side = board[col][row] -> getside();
     board[col][row] = nullPiece;
 
     board[col][row] = new Queen(side, col, row);
 }
 
-Piece *b_r1 = new Rook('B', 0, 0);
-Piece *b_n1 = new Knight('B', 1, 0);
-Piece *b_b1 = new Bishop('B', 2, 0);
-Piece *b_q = new Queen('B', 3, 0);
-Piece *b_k = new King('B', 4, 0);
-Piece *b_b2 = new Bishop('B', 5, 0);
-Piece *b_n2 = new Knight('B', 6, 0);
-Piece *b_r2 = new Rook('B', 7, 0);
-Piece *b_p1 = new Pawn('B', 0, 1);
-Piece *b_p2 = new Pawn('B', 1, 1);
-Piece *b_p3 = new Pawn('B', 2, 1);
-Piece *b_p4 = new Pawn('B', 3, 1);
-Piece *b_p5 = new Pawn('B', 4, 1);
-Piece *b_p6 = new Pawn('B', 5, 1);
-Piece *b_p7 = new Pawn('B', 6, 1);
-Piece *b_p8 = new Pawn('B', 7, 1);
-
-Piece *w_r1 = new Rook('W', 0, 7);
-Piece *w_n1 = new Knight('W', 1, 7);
-Piece *w_b1 = new Bishop('W', 2, 7);
-Piece *w_q = new Queen('W', 3, 7);
-Piece *w_k = new King('W', 4, 7);
-Piece *w_b2 = new Bishop('W', 5, 7);
-Piece *w_n2 = new Knight('W', 6, 7);
-Piece *w_r2 = new Rook('W', 7, 7);
-Piece *w_p1 = new Pawn('W', 0, 6);
-Piece *w_p2 = new Pawn('W', 1, 6);
-Piece *w_p3 = new Pawn('W', 2, 6);
-Piece *w_p4 = new Pawn('W', 3, 6);
-Piece *w_p5 = new Pawn('W', 4, 6);
-Piece *w_p6 = new Pawn('W', 5, 6);
-Piece *w_p7 = new Pawn('W', 6, 6);
-Piece *w_p8 = new Pawn('W', 7, 6);
+Piece *b_r1 = new Rook('B', 0, 0);      Piece *w_r1 = new Rook('W', 0, 7);
+Piece *b_n1 = new Knight('B', 1, 0);    Piece *w_n1 = new Knight('W', 1, 7);
+Piece *b_b1 = new Bishop('B', 2, 0);    Piece *w_b1 = new Bishop('W', 2, 7);
+Piece *b_q = new Queen('B', 3, 0);      Piece *w_q = new Queen('W', 3, 7);
+Piece *b_k = new King('B', 4, 0);       Piece *w_k = new King('W', 4, 7);
+Piece *b_b2 = new Bishop('B', 5, 0);    Piece *w_b2 = new Bishop('W', 5, 7);
+Piece *b_n2 = new Knight('B', 6, 0);    Piece *w_n2 = new Knight('W', 6, 7);
+Piece *b_r2 = new Rook('B', 7, 0);      Piece *w_r2 = new Rook('W', 7, 7);
+Piece *b_p1 = new Pawn('B', 0, 1);      Piece *w_p1 = new Pawn('W', 0, 6);
+Piece *b_p2 = new Pawn('B', 1, 1);      Piece *w_p2 = new Pawn('W', 1, 6);
+Piece *b_p3 = new Pawn('B', 2, 1);      Piece *w_p3 = new Pawn('W', 2, 6);
+Piece *b_p4 = new Pawn('B', 3, 1);      Piece *w_p4 = new Pawn('W', 3, 6);
+Piece *b_p5 = new Pawn('B', 4, 1);      Piece *w_p5 = new Pawn('W', 4, 6);
+Piece *b_p6 = new Pawn('B', 5, 1);      Piece *w_p6 = new Pawn('W', 5, 6);
+Piece *b_p7 = new Pawn('B', 6, 1);      Piece *w_p7 = new Pawn('W', 6, 6);
+Piece *b_p8 = new Pawn('B', 7, 1);      Piece *w_p8 = new Pawn('W', 7, 6);
 
 void addNulls() {
     for (int i = 2; i < 6; i++)
@@ -980,14 +962,14 @@ bool checkmateDetect() {
     char sideThreatened = check;
     int movesForPiece[8][8];
 
-    std::cout << "sideThreatened has been set to " << sideThreatened << " from " << check << std::endl;
+    //std::cout << "sideThreatened has been set to " << sideThreatened << " from " << check << std::endl;
     
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
 
             if (board[j][i] -> getside() == sideThreatened) {
 
-                std::cout << j << ", " << i << " must be tested" << std::endl;
+                //std::cout << j << ", " << i << " must be tested" << std::endl;
                 for (int k = 0; k < 8; k++)
                     for (int l = 0; l < 8; l++)
                         movesForPiece[l][k] = 0;
@@ -1116,12 +1098,12 @@ void toPlay() {
                 }
 
                 if (check == turn) {
-                    std::cout << "Still in check" << std::endl;
+                    //std::cout << "Still in check" << std::endl;
                     goto restart;
                 }
                     
                 else {
-                    std::cout << "No longer in check" << std::endl;
+                    //std::cout << "No longer in check" << std::endl;
                     resetMoveset();
                     board[startCol][startRow] -> gatherMatrix();
                     board[startCol][startRow] -> move(endCol, endRow);
@@ -1153,9 +1135,27 @@ int main() {
 
     while (inPlay) {
         printBoard();
-        std::cout << "In check? " << check << std::endl;
+        //std::cout << "In check? " << check << std::endl;
         toPlay();
     }
+
+    delete(nullPiece);
+    delete(b_p1);   delete(w_p1);
+    delete(b_p2);   delete(w_p2);
+    delete(b_p3);   delete(w_p3);
+    delete(b_p4);   delete(w_p4);
+    delete(b_p5);   delete(w_p5);
+    delete(b_p6);   delete(w_p6);
+    delete(b_p7);   delete(w_p7);
+    delete(b_p8);   delete(w_p8);
+    delete(b_r1);   delete(w_r1);
+    delete(b_r2);   delete(w_r2);
+    delete(b_n1);   delete(w_n1);
+    delete(b_n2);   delete(w_n2);
+    delete(b_b1);   delete(w_b1);
+    delete(b_b2);   delete(w_b2);
+    delete(b_q);    delete(b_q);
+    delete(b_k);    delete(b_k);
 
     return 0;
 }
